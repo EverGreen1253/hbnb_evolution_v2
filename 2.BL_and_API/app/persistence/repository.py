@@ -42,7 +42,13 @@ class InMemoryRepository(Repository):
     def update(self, obj_id, data):
         obj = self.get(obj_id)
         if obj:
-            obj.update(data)
+            # We can't use the update method because obj is a User object and not a dict
+            # obj.update(data)
+
+            # let's do it the old fashioned way
+            for key in data:
+                setattr(obj, key, data[key])
+
 
     def delete(self, obj_id):
         if obj_id in self._storage:

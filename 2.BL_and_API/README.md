@@ -5,6 +5,11 @@ e.g. self.description = description  VS  self._description = value
 The one in the constructor is actually calling the setter, and the one in the setter is actually saving the value to the internal _description attribute. The name shown to the outside world is actually invoking the getters and setters while internally the attribute's name has an underscore prefix.
 
 
+-- Base model --
+In the documentation, there is a brief mention of using the BaseModel class and inheriting from it. My code does not do this so you will see the uuid, last_created and last_updated attributes appear again and again in every model.
+To be honest, whether you want to inherit from a class or not is up to you. The advantage is that it reduces the number of things you need to type and makes code maintennence easier, but it may also be a pain-in-the-behind if the code changes frequently and you have to update two places regularly instead of just one.
+
+
 -- User model --
 Pretty straight forward for most of the model. Note that a very simple regular expression is used to validate the email address.
 
@@ -23,3 +28,9 @@ Nothing special.
 
 -- Amenity model --
 Nothing special.
+
+
+-- Tests --
+The way I wrote my tests is slightly different from the example code in the project but it still works.
+
+Fomr the command line, make sure you are in the 'app' folder, then run the following: python3 -m unittest tests/test_user.py

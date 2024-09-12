@@ -25,5 +25,7 @@ class TestPlace(unittest.TestCase):
         assert place.reviews[0].text == "Great stay!"
         print("Place creation and relationship test passed!")
 
+    # TODO: add more tests
+
 if __name__ == '__main__':
     unittest.main()

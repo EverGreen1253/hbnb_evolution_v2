@@ -14,5 +14,7 @@ class TestAmenity(unittest.TestCase):
         assert amenity.name == "Wi-Fi"
         print("Amenity creation test passed!")
 
+    # TODO: add more tests
+
 if __name__ == '__main__':
     unittest.main()

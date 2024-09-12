@@ -16,7 +16,9 @@ class TestUser(unittest.TestCase):
         assert user.last_name == "Parker"
         assert user.email == "iluvspiderman@dailybugle.com"
         assert user.is_admin is False  # Default value
-        # print("User creation test passed!")
+        print("User creation test passed!")
+
+    # TODO: add more tests
 
 if __name__ == '__main__':
     unittest.main()
