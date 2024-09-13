@@ -1,10 +1,16 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
+from app.models.amenity import Amenity
 
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
+        self.amenity_repo = InMemoryRepository()
 
+    # In case anyone is curious about the **
+    # https://www.geeksforgeeks.org/what-does-the-double-star-operator-mean-in-python/
+
+    # --- Users ---
     def create_user(self, user_data):
         user = User(**user_data)
         self.user_repo.add(user)
@@ -21,3 +27,23 @@ class HBnBFacade:
 
     def update_user(self, user_id, user_data):
         self.user_repo.update(user_id, user_data)
+
+
+    # --- Amenities ---
+    # Used during record insertion to prevent duplicate amenities
+    def get_amenity_by_name(self, name):
+        return self.amenity_repo.get_by_attribute('name', name)
+
+    def create_amenity(self, amenity_data):
+        amenity = Amenity(**amenity_data)
+        self.amenity_repo.add(amenity)
+        return amenity
+
+    def get_amenity(self, amenity_id):
+        return self.amenity_repo.get(amenity_id)
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
+
+    def update_amenity(self, amenity_id, amenity_data):
+        self.amenity_repo.update(amenity_id, amenity_data)

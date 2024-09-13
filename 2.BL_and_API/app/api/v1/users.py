@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
-from app.services.facade import HBnBFacade
+# from app.services.facade import HBnBFacade
+from app import facade
 
 api = Namespace('users', description='User operations')
 
@@ -10,8 +11,7 @@ user_model = api.model('User', {
     'email': fields.String(required=True, description='Email of the user')
 })
 
-facade = HBnBFacade()
-
+# facade = HBnBFacade()
 
 @api.route('/')
 class UserList(Resource):
@@ -41,7 +41,7 @@ class UserList(Resource):
         all_users = facade.get_all_users()
         output = []
         for user in all_users:
-            print(user)
+            # print(user)
             output.append({
                 'id': str(user.id),
                 'first_name': user.first_name,
@@ -72,7 +72,7 @@ class UserResource(Resource):
 
         # Ensure that user_data contains only what we want (e.g. first_name, last_name, email)
         # https://stackoverflow.com/questions/10995172/check-if-list-of-keys-exist-in-dictionary
-        if len(user_data) != 3 or not all(key in wanted_keys_list for key in user_data):
+        if len(user_data) != len(wanted_keys_list) or not all(key in wanted_keys_list for key in user_data):
             return {'error': 'Bad Request - submitted data does not contain required attributes'}, 400
 
         # Check that user exists first before updating them
