@@ -65,6 +65,7 @@ class PlaceList(Resource):
         # the try catch is here in case setter validation fails
         new_place = None
         try:
+            # I'm seriously confused if we're storing a user object in the owner slot or just the id
             new_place = facade.create_place(places_data)
         except ValueError as error:
             return { 'error': "Setter validation failure: {}".format(error) }, 400

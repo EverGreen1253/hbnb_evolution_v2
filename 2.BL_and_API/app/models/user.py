@@ -77,10 +77,12 @@ class User:
     @email.setter
     def email(self, value):
         """Setter for prop last_name"""
+        # calls the method in the facade object
+        from app import facade
 
         # add a simple regex check for email format. Nothing too fancy.
         is_valid_email = len(value.strip()) > 0 and re.search("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$", value)
-        email_exists = self.email_exists(value.strip())
+        email_exists = facade.get_user_by_email(value.strip())
         if is_valid_email and not email_exists:
             self._email = value
         else:
