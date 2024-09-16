@@ -134,6 +134,27 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
+        # curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>" -H "Content-Type: application/json" -d '{
+        # "title": "Not So Cozy Apartment",
+        # "description": "A terrible place to stay",
+        # "price": 999.99
+        # }'
+
         """Update a place's information"""
-        # Placeholder for the logic to update a place by ID
-        pass
+        place_data = api.payload
+        wanted_keys_list = ['title', 'description', 'price']
+
+        if len(place_data) != len(wanted_keys_list) or not all(key in wanted_keys_list for key in place_data):
+            return {'error': 'Invalid input data - required attributes missing'}, 400
+
+        # Check that place exists first before updating them
+        place = facade.get_place(place_id)
+        if place:
+            try:
+                facade.update_place(place_id, place_data)
+            except ValueError as error:
+                return { 'error': "Setter validation failure: {}".format(error) }, 400
+
+            return {'message': 'Place updated successfully'}, 200
+
+        return {'error': 'Place not found'}, 404
