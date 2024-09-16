@@ -119,11 +119,9 @@ class User:
     @staticmethod
     def email_exists(email):
         """ Search through all Users to check the email exists """
-        #TODO: figure out how to search through all the User models in memory
-        return False
+        # Unused - the facade method get_user_by_email will handle this
 
     @staticmethod
     def user_exists(user_id):
         """ Search through all Users to ensure the specified user_id exists """
-        #TODO: figure out how to search through all the User models in memory
-        return True
+        # Unused - the facade method get_user will handle this

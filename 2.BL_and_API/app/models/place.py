@@ -1,10 +1,9 @@
 import uuid
 from datetime import datetime
-from models.user import User
 
 class Place:
     def __init__(self, title, description, price, latitude, longitude, owner_id):
-        if title is None or price is None or latitude is None or longitude is None or owner_id is None:
+        if title is None or description is None or price is None or latitude is None or longitude is None or owner_id is None:
             raise ValueError("Required attributes not specified!")
 
         self.id = str(uuid.uuid4())
@@ -93,8 +92,10 @@ class Place:
     @owner_id.setter
     def owner_id(self, value):
         """Setter for prop owner_id"""
-        # Calls the static method in the User model
-        owner_exists = User.user_exists(value)
+        # calls the method in the facade object
+        from app import facade
+
+        owner_exists = facade.get_user(value)
         if owner_exists:
             self._owner_id = value
         else:
@@ -116,5 +117,4 @@ class Place:
     @staticmethod
     def place_exists(place_id):
         """ Search through all Places to ensure the specified place_id exists """
-        #TODO: figure out how to search through all the Place models in memory
-        return True
+        # Unused - the facade get_place method will handle this

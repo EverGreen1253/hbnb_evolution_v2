@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
-from models.user import User
-from models.place import Place
+from app.models.user import User
+from app.models.place import Place
 
 class Review:
     def __init__(self, text, rating, place_id, user_id):

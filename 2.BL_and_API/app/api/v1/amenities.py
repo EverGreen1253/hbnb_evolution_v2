@@ -17,6 +17,7 @@ class AmenityList(Resource):
     @api.response(201, 'Amenity successfully created')
     @api.response(400, 'Amenity already exists')
     @api.response(400, 'Invalid input data')
+    @api.response(400, 'Setter validation failure')
     def post(self):
         """Register a new amenity"""
         amenity_data = api.payload
@@ -31,8 +32,13 @@ class AmenityList(Resource):
         if len(amenity_data) != len(wanted_keys_list) or not all(key in wanted_keys_list for key in amenity_data):
             return {'error': 'Invalid input data'}, 400
 
-        # If we managed to survive all the way here, perform the data submission
-        new_amenity = facade.create_amenity(amenity_data)
+        # the try catch is here in case setter validation fails
+        new_amenity = None
+        try:
+            new_amenity = facade.create_amenity(amenity_data)
+        except ValueError as error:
+            return { 'error': "Setter validation failure: {}".format(error) }, 400
+
         return {'id': str(new_amenity.id), 'message': 'Amenity created successfully'}, 201
 
     @api.response(200, 'List of amenities retrieved successfully')
@@ -56,7 +62,6 @@ class AmenityResource(Resource):
     def get(self, amenity_id):
         """Get amenity details by ID"""
         amenity = facade.get_amenity(amenity_id)
-
         if not amenity:
             return {'error': 'Amenity not found'}, 400
 
@@ -69,8 +74,9 @@ class AmenityResource(Resource):
 
     @api.expect(amenity_model)
     @api.response(200, 'Amenity updated successfully')
-    @api.response(404, 'Amenity not found')
     @api.response(400, 'Invalid input data')
+    @api.response(400, 'Setter validation failure')
+    @api.response(404, 'Amenity not found')
     def put(self, amenity_id):
         """Update an amenity's information"""
         amenity_data = api.payload
@@ -78,12 +84,16 @@ class AmenityResource(Resource):
 
         # Ensure that amenity_data contains only what we want (e.g. name)
         if len(amenity_data) != len(wanted_keys_list) or not all(key in wanted_keys_list for key in amenity_data):
-            return {'error': 'Bad Request - submitted data does not contain required attributes'}, 400
+            return {'error': 'Invalid input data - required attributes missing'}, 400
 
         # Check that user exists first before updating them
         amenity = facade.get_amenity(amenity_id)
         if amenity:
-            facade.update_amenity(amenity_id, amenity_data)
+            try:
+                facade.update_amenity(amenity_id, amenity_data)
+            except ValueError as error:
+                return { 'error': "Setter validation failure: {}".format(error) }, 400
+
             return {'message': 'Amenity updated successfully'}, 200
 
         return {'error': 'Amenity not found'}, 404

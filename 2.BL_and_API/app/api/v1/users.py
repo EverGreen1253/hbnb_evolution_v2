@@ -19,7 +19,14 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @api.response(400, 'Setter validation failure')
     def post(self):
+        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
+        # "first_name": "John",
+        # "last_name": "Doe",
+        # "email": "john.doe@example.com"
+        # }'
+
         """Register a new user"""
         user_data = api.payload
 
@@ -32,7 +39,13 @@ class UserList(Resource):
         if not all([user_data.get('first_name'), user_data.get('last_name'), user_data.get('email')]):
             return {'error': 'Invalid input data'}, 400
 
-        new_user = facade.create_user(user_data)
+        # the try catch is here in case setter validation fails
+        new_user = None
+        try:
+            new_user = facade.create_user(user_data)
+        except ValueError as error:
+            return { 'error': "Setter validation failure: {}".format(error) }, 400
+
         return {'id': str(new_user.id), 'message': 'User created successfully'}, 201
 
     @api.response(200, 'Users list successfully retrieved')
@@ -60,10 +73,13 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+
         return {'id': str(user.id), 'first_name': user.first_name, 'last_name': user.last_name, 'email': user.email}, 200
 
+    @api.expect(user_model)
     @api.response(200, 'User details updated successfully')
-    @api.response(400, 'Bad Request')
+    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Setter validation failure')
     @api.response(404, 'User not found')
     def put(self, user_id):
         """ Update user specified by id """
@@ -73,12 +89,16 @@ class UserResource(Resource):
         # Ensure that user_data contains only what we want (e.g. first_name, last_name, email)
         # https://stackoverflow.com/questions/10995172/check-if-list-of-keys-exist-in-dictionary
         if len(user_data) != len(wanted_keys_list) or not all(key in wanted_keys_list for key in user_data):
-            return {'error': 'Bad Request - submitted data does not contain required attributes'}, 400
+            return {'error': 'Invalid input data - required attributes missing'}, 400
 
         # Check that user exists first before updating them
         user = facade.get_user(user_id)
         if user:
-            facade.update_user(user_id, user_data)
+            try:
+                facade.update_user(user_id, user_data)
+            except ValueError as error:
+                return { 'error': "Setter validation failure: {}".format(error) }, 400
+
             return {'message': 'User updated successfully'}, 200
 
         return {'error': 'User not found'}, 404
