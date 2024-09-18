@@ -1,7 +1,5 @@
 import uuid
 from datetime import datetime
-from app.models.user import User
-from app.models.place import Place
 
 class Review:
     def __init__(self, text, rating, place_id, user_id):
@@ -49,8 +47,10 @@ class Review:
     @user_id.setter
     def user_id(self, value):
         """Setter for prop user_id"""
-        # Calls the static method in the User model
-        user_exists = User.user_exists(value)
+        # calls the method in the facade object
+        from app import facade
+
+        user_exists = facade.get_user(value)
         if user_exists:
             self._user_id = value
         else:
@@ -64,8 +64,10 @@ class Review:
     @place_id.setter
     def place_id(self, value):
         """Setter for prop place_id"""
-        # Calls the static method in the Place model
-        place_exists = Place.place_exists(value)
+        # calls the method in the facade object
+        from app import facade
+
+        place_exists = facade.get_place(value)
         if place_exists:
             self._place_id = value
         else:
@@ -75,3 +77,8 @@ class Review:
     def save(self):
         """Update the updated_at timestamp whenever the object is modified"""
         self.updated_at = datetime.now()
+
+    @staticmethod
+    def review_exists(review_id):
+        """ Search through all Reviews to ensure the specified review_id exists """
+        # Unused - the facade method get_review will handle this
