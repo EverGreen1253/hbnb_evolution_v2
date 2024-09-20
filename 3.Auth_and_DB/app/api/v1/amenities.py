@@ -1,4 +1,5 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 # from app.services.facade import HBnBFacade
 from app import facade
 
@@ -18,8 +19,13 @@ class AmenityList(Resource):
     @api.response(400, 'Amenity already exists')
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
+    @api.response(403, 'Admin privileges required')
     def post(self):
         """Register a new amenity"""
+        claims = get_jwt()
+        if not claims['is_admin']:
+            return {'error': 'Admin privileges required'}, 403
+
         amenity_data = api.payload
 
         # Check if already exists
@@ -76,9 +82,14 @@ class AmenityResource(Resource):
     @api.response(200, 'Amenity updated successfully')
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
+    @api.response(403, 'Admin privileges required')
     @api.response(404, 'Amenity not found')
     def put(self, amenity_id):
         """Update an amenity's information"""
+        claims = get_jwt()
+        if not claims['is_admin']:
+            return {'error': 'Admin privileges required'}, 403
+
         amenity_data = api.payload
         wanted_keys_list = ['name']
 

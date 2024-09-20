@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 # from app.services.facade import HBnBFacade
 from app import facade
 
@@ -21,15 +21,22 @@ class UserList(Resource):
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
+    @api.response(403, 'Admin privileges required')
+    # @jwt_required()
     def post(self):
-        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
-        # "first_name": "John",
-        # "last_name": "Doe",
-        # "email": "john.doe@example.com"
-        # "password": "cowabunga"
-        # }'
+        # Create the user
+        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{ "first_name": "John", "last_name": "Doe", "email": "john.doe@example.com", "password": "cowabunga", "is_admin": true}'
+
+        # We have a chicken and egg problem here. If the claims verification is active, creating
+        # a new user would need you to submit a JWT. BUT! To get a JWT first, you'll need to be
+        # able to login an existing user. And then you'd need to create a user first.
+        # See the problem?!?!?
 
         """Register a new user"""
+        # claims = get_jwt()
+        # if not claims['is_admin']:
+        #     return {'error': 'Admin privileges required'}, 403
+
         user_data = api.payload
 
         # Simulate email uniqueness check (to be replaced by real validation with persistence)
@@ -83,6 +90,7 @@ class UserResource(Resource):
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
     @api.response(400, 'You cannot modify email or password.')
+    @api.response(403, 'Admin privileges required')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'User not found')
     @jwt_required()
@@ -90,6 +98,10 @@ class UserResource(Resource):
         # curl -X PUT "http://127.0.0.1:5000/api/v1/users/<user_id>" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "first_name": "Reed", "last_name": "Richards" }'
 
         """ Update user specified by id """
+        claims = get_jwt()
+        if not claims['is_admin']:
+            return {'error': 'Admin privileges required'}, 403
+
         current_user = get_jwt_identity()
         if user_id != current_user['id']:
             return { 'error': "Unauthorized action" }, 403

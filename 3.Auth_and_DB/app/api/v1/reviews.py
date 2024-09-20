@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 # from app.services.facade import HBnBFacade
 from app import facade
 
@@ -106,21 +106,22 @@ class ReviewResource(Resource):
         # curl -X PUT "http://127.0.0.1:5000/api/v1/reviews/<review_id>" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "text": "So lovely!", "rating": 5 }'
 
         """Update a review's information"""
+        claims = get_jwt()
         current_user = get_jwt_identity()
+
+        # Check that review exists first before updating them
+        review = facade.get_review(review_id)
+        if not review:
+            return {'error': 'Review not found'}, 404
+        if not claims.get('is_admin', True) and review.user_id != current_user['id']:
+            return { 'error': "Unauthorized action" }, 403
+
         review_data = api.payload
         wanted_keys_list = ['text', 'rating']
 
         # check that required attributes are present
         if not all(name in wanted_keys_list for name in review_data):
             return { 'error': "Invalid input data - required attributes missing" }, 400
-
-        # Check that review exists first before updating them
-        review = facade.get_review(review_id)
-        if not review:
-            return {'error': 'Review not found'}, 404
-
-        if review.user_id != current_user['id']:
-            return { 'error': "Unauthorized action" }, 403
 
         try:
             facade.update_review(review_id, review_data)

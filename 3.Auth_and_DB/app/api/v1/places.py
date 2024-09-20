@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 # from app.services.facade import HBnBFacade
 from app import facade
 
@@ -149,11 +149,13 @@ class PlaceResource(Resource):
         # curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{"title": "Not So Cozy Apartment","description": "A terrible place to stay","price": 999.99}'
 
         """Update a place's information"""
+        claims = get_jwt()
         current_user = get_jwt_identity()
+
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
-        if place.owner_id != current_user['id']:
+        if not claims.get('is_admin', True) and place.owner_id != current_user['id']:
             return {'error': 'Unauthorized action'}, 403
 
         place_data = api.payload
