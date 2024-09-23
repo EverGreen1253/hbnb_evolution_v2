@@ -22,20 +22,20 @@ class UserList(Resource):
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
     @api.response(403, 'Admin privileges required')
-    # @jwt_required()
+    @jwt_required()
     def post(self):
         # Create the user
-        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{ "first_name": "John", "last_name": "Doe", "email": "john.doe@example.com", "password": "cowabunga", "is_admin": true}'
+        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "first_name": "John", "last_name": "Doe", "email": "john.doe@example.com", "password": "cowabunga", "is_admin": true}'
 
-        # We have a chicken and egg problem here. If the claims verification is active, creating
-        # a new user would need you to submit a JWT. BUT! To get a JWT first, you'll need to be
-        # able to login an existing user. And then you'd need to create a user first.
-        # See the problem?!?!?
+        # We have a chicken and egg problem here. If the claims verification is active
+        # creating a new user would need you to submit a JWT. BUT! To get a JWT first,
+        # you'll need to be able to login an existing user. And then you'd need to create
+        # a user first. See the problem?!?!?
 
         """Register a new user"""
-        # claims = get_jwt()
-        # if not claims['is_admin']:
-        #     return {'error': 'Admin privileges required'}, 403
+        claims = get_jwt()
+        if not claims.get('is_admin', True):
+            return {'error': 'Admin privileges required'}, 403
 
         user_data = api.payload
 
@@ -67,7 +67,7 @@ class UserList(Resource):
             output.append({
                 'id': str(user.id),
                 'first_name': user.first_name,
-                'last_name': user.first_name,
+                'last_name': user.last_name,
                 'email': user.email
             })
 
@@ -98,20 +98,43 @@ class UserResource(Resource):
         # curl -X PUT "http://127.0.0.1:5000/api/v1/users/<user_id>" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "first_name": "Reed", "last_name": "Richards" }'
 
         """ Update user specified by id """
-        claims = get_jwt()
-        if not claims['is_admin']:
-            return {'error': 'Admin privileges required'}, 403
-
-        current_user = get_jwt_identity()
-        if user_id != current_user['id']:
-            return { 'error': "Unauthorized action" }, 403
-
         user_data = api.payload
-        wanted_keys_list = ['first_name', 'last_name']
 
-        # don't allow changes to email or password
-        if 'email' in user_data or 'password' in user_data:
-            return { 'error': "You cannot modify email or password." }, 400
+        is_admin_user = False
+        claims = get_jwt()
+        if claims.get('is_admin', True):
+            is_admin_user = True
+
+        # user may only be updating one or two items and not everything
+        wanted_keys_list = []
+        if 'first_name' in user_data:
+            wanted_keys_list.append('first_name')
+        if 'last_name' in user_data:
+            wanted_keys_list.append('last_name')
+
+        if not is_admin_user:
+            # don't allow changes to email or password if not Admin
+            if 'email' in user_data or 'password' in user_data:
+                return { 'error': "You cannot modify email or password." }, 400
+
+            current_user = get_jwt_identity()
+            if user_id != current_user['id']:
+                return { 'error': "Unauthorized action" }, 403
+        else:
+            # users are able to update their own details (first_name, last_name)
+            # but cannot change their email or password
+            if 'email' in user_data:
+                # make sure the email isn't already taken!
+                existing_user = facade.get_user_by_email(user_data['email'])
+                if existing_user:
+                    return {'error': 'Email already registered'}, 400
+
+                wanted_keys_list.append('email')
+            if 'password' in user_data:
+                wanted_keys_list.append('password')
+
+        # NOTE: If the user_data contains any extra attributes aside from what is assembled
+        # within wanted_keys_list, the if-else check below will throw an error.
 
         # Ensure that user_data contains only what we want (e.g. first_name, last_name)
         # https://stackoverflow.com/questions/10995172/check-if-list-of-keys-exist-in-dictionary
