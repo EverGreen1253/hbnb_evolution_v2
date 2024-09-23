@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 # from app.services.facade import HBnBFacade
-from app import facade
+from app.api import facade
 
 api = Namespace('users', description='User operations')
 
@@ -21,11 +21,7 @@ class UserList(Resource):
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
     def post(self):
-        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
-        # "first_name": "John",
-        # "last_name": "Doe",
-        # "email": "john.doe@example.com"
-        # }'
+        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{"first_name": "John","last_name": "Doe","email": "john.doe@example.com"}'
 
         """Register a new user"""
         user_data = api.payload
@@ -58,7 +54,7 @@ class UserList(Resource):
             output.append({
                 'id': str(user.id),
                 'first_name': user.first_name,
-                'last_name': user.first_name,
+                'last_name': user.last_name,
                 'email': user.email
             })
 

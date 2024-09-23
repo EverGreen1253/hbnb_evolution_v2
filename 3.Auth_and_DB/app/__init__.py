@@ -1,18 +1,37 @@
 """ Constructor for the 'app' module """
-from app.services.facade import HBnBFacade
+from flask import Flask
+from flask_restx import Api
+from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
+from app.api.v1.users import api as users_ns
+from app.api.v1.amenities import api as amenities_ns
+from app.api.v1.places import api as places_ns
+from app.api.v1.reviews import api as reviews_ns
+from app.api.v1.auth import api as auth_ns
+from app.api.v1.protected import api as protected_ns
 
-facade = HBnBFacade()
+db = SQLAlchemy()
 
-# Task 4 - create a default admin user to overcome the chicken-and-egg problem
-# that will happen when the Create User has a @jwt_required slapped on top of it.
+def create_app():
+    """ method used to create an app instance """
 
-facade.create_user({
-    "first_name": "Super",
-    "last_name": "Admin",
-    "email": "super.admin@hbnb.com",
-    "password": "password",
-    "is_admin": True
-})
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/hbnb_evo_2'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# With this default admin, we now will be able to log into the system to create more users.
-# curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "super.admin@hbnb.com", "password": "password" }'
+    db.init_app(app)
+
+    api = Api(app, version='1.0', title='HBnB API', description='HBnB Application API')
+
+    # Register the namespaces
+    api.add_namespace(users_ns, path='/api/v1/users')
+    api.add_namespace(amenities_ns, path='/api/v1/amenities')
+    api.add_namespace(places_ns, path='/api/v1/places')
+    api.add_namespace(reviews_ns, path='/api/v1/reviews')
+    api.add_namespace(auth_ns, path='/api/v1/auth')
+    api.add_namespace(protected_ns, path='/api/v1/protected')
+
+    app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'  # Use a strong and unique key in production
+    jwt = JWTManager(app)
+
+    return app

@@ -93,7 +93,7 @@ class Place:
     def owner_id(self, value):
         """Setter for prop owner_id"""
         # calls the method in the facade object
-        from app import facade
+        from app.api import facade
 
         owner_exists = facade.get_user(value)
         if owner_exists:

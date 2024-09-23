@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 # from app.services.facade import HBnBFacade
-from app import facade
+from app.api import facade
 
 api = Namespace('places', description='Place operations')
 
@@ -48,20 +48,9 @@ class PlaceList(Resource):
     def post(self):
         # Need to add at least one user first so that we have someone in the system as an owner
 
-        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{
-        #   "first_name": "John",
-        #   "last_name": "Doe",
-        #   "email": "john.doe@example.com"
-        # }'
+        # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -d '{"first_name": "John","last_name": "Doe","email": "john.doe@example.com"}'
 
-        # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -d '{
-        # "title": "Cozy Apartment",
-        # "description": "A nice place to stay",
-        # "price": 100.0,
-        # "latitude": 37.7749,
-        # "longitude": -122.4194,
-        # "owner_id": ""
-        # }'
+        # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -d '{"title": "Cozy Apartment","description": "A nice place to stay","price": 100.0,"latitude": 37.7749,"longitude": -122.4194,"owner_id": ""}'
 
         """Register a new place"""
         places_data = api.payload

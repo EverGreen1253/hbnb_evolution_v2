@@ -84,7 +84,7 @@ class User:
     def email(self, value):
         """Setter for prop email"""
         # calls the method in the facade object
-        from app import facade
+        from app.api import facade
 
         # add a simple regex check for email format. Nothing too fancy.
         is_valid_email = len(value.strip()) > 0 and re.search("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$", value)
