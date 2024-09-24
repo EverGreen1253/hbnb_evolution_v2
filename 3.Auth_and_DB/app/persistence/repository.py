@@ -1,3 +1,5 @@
+import flask
+from app.persistence import db
 from abc import ABC, abstractmethod
 
 class Repository(ABC):
@@ -59,9 +61,9 @@ class InMemoryRepository(Repository):
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
+        db.init_app(flask.current_app)
 
     def add(self, obj):
-        from app import db
         db.session.add(obj)
         db.session.commit()
 
@@ -72,7 +74,6 @@ class SQLAlchemyRepository(Repository):
         return self.model.query.all()
 
     def update(self, obj_id, data):
-        from app import db
         obj = self.get(obj_id)
         if obj:
             for key, value in data.items():
@@ -80,7 +81,6 @@ class SQLAlchemyRepository(Repository):
             db.session.commit()
 
     def delete(self, obj_id):
-        from app import db
         obj = self.get(obj_id)
         if obj:
             db.session.delete(obj)

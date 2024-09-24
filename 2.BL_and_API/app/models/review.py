@@ -48,7 +48,7 @@ class Review:
     def user_id(self, value):
         """Setter for prop user_id"""
         # calls the method in the facade object
-        from app.api import facade
+        from app.services import facade
 
         user_exists = facade.get_user(value)
         if user_exists:
@@ -65,7 +65,7 @@ class Review:
     def place_id(self, value):
         """Setter for prop place_id"""
         # calls the method in the facade object
-        from app.api import facade
+        from app.services import facade
 
         place_exists = facade.get_place(value)
         if place_exists:
