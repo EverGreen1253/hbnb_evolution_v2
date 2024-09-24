@@ -59,6 +59,8 @@ class UserList(Resource):
 
     @api.response(200, 'Users list successfully retrieved')
     def get(self):
+        # curl -X GET http://localhost:5000/api/v1/users/
+
         """ Get list of all users """
         all_users = facade.get_all_users()
         output = []
@@ -78,6 +80,8 @@ class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
     def get(self, user_id):
+        # curl -X GET http://localhost:5000/api/v1/users/<user_id>
+
         """Get user details by ID"""
         user = facade.get_user(user_id)
         if not user:

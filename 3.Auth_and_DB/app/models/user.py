@@ -1,5 +1,6 @@
 """ User model """
 
+from app import db
 import uuid
 import re
 from datetime import datetime
@@ -7,20 +8,16 @@ from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt()
 
-class User:
+class User(db.Model):
     """ User class """
-    # NOTE: The attribute declarations below can be considered redundant
-    # but I still like to do it out of habit.
+    __tablename__ = 'users'
 
-    # id = None
-    # first_name = ""
-    # last_name = ""
-    # email = ""
-    # is_admin = False
-    # created_at = None
-    # updated_at = None
-    # places = []
-    # reviews = []
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     def __init__(self, first_name, last_name, email, password=None, is_admin = False):
         # NOTE: Attributes that don't already exist will be

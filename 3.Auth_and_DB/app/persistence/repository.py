@@ -1,5 +1,4 @@
-import flask
-from app.persistence import db
+from app import db
 from abc import ABC, abstractmethod
 
 class Repository(ABC):
@@ -61,7 +60,6 @@ class InMemoryRepository(Repository):
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
-        db.init_app(flask.current_app)
 
     def add(self, obj):
         db.session.add(obj)
