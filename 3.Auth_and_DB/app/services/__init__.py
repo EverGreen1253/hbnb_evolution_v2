@@ -23,7 +23,6 @@ if isinstance(facade.user_repo, UserRepository):
     result = facade.user_repo.get_user_by_email("super.admin@hbnb.com")
 
     # If no Super Admin exists, create a new one
-    # Note that the attribute has an underscore. It seems that I can't use getters??
     if result is None:
         facade.create_user({
             "first_name": "Super",
