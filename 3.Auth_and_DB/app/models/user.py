@@ -1,23 +1,30 @@
 """ User model """
 
-from app import db
+from app.persistence import Base
 import uuid
 import re
 from datetime import datetime
 from flask_bcrypt import Bcrypt
+from sqlalchemy import Column, String, DateTime, Boolean
+from sqlalchemy.orm import relationship
 
 bcrypt = Bcrypt()
 
-class User(db.Model):
+class User(Base):
     """ User class """
     __tablename__ = 'users'
 
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), nullable=False, unique=True)
-    password = db.Column(db.String(128), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    # Remember: if you have getters & setters for any of the attributes
+    # you can't use the same name for the attirbutes themselves
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=False, default=datetime.now())
+    _first_name = Column("first_name", String(50), nullable=False)
+    _last_name = Column("last_name", String(50), nullable=False)
+    _email = Column("email", String(120), nullable=False, unique=True)
+    _password = Column("password", String(128), nullable=False)
+    _is_admin = Column("is_admin", Boolean, default=False)
 
     def __init__(self, first_name, last_name, email, password=None, is_admin = False):
         # NOTE: Attributes that don't already exist will be
