@@ -62,6 +62,8 @@ class PlaceList(Resource):
         """Register a new place"""
         places_data = api.payload
         current_user = get_jwt_identity()
+
+        # adding owner_id back in so that places_data still plays nice with the old code
         places_data['owner_id'] = current_user['id']
 
         wanted_keys_list = ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']
@@ -70,15 +72,32 @@ class PlaceList(Resource):
         if not all(name in wanted_keys_list for name in places_data):
             return { 'error': "Invalid input data" }, 400
 
+        # check that user exists
+        user = facade.get_user(str(places_data.get('owner_id')))
+        if not user:
+            return { 'error': "Invalid input data - user does not exist" }, 400
+
         # the try catch is here in case setter validation fails
         new_place = None
         try:
-            # I'm seriously confused if we're storing a user object in the owner slot or just the id
+            # NOTE: We're storing a user object in the owner slot and getting rid of owner_id
+            places_data['owner'] = user
+            del places_data['owner_id']
+
             new_place = facade.create_place(places_data)
         except ValueError as error:
             return { 'error': "Setter validation failure: {}".format(error) }, 400
 
-        return {'id': str(new_place.id), 'message': 'Place created successfully'}, 201
+        output = {
+            'id': str(new_place.id),
+            "title": new_place.title,
+            "description": new_place.description,
+            "price": new_place.price,
+            'latitude': new_place.latitude,
+            'longitude': new_place.longitude,
+            "owner_id": new_place.owner.id
+        }
+        return output, 201
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):

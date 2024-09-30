@@ -3,6 +3,7 @@
 from app.persistence import Base
 import uuid
 from datetime import datetime
+from app.models.user import User
 from sqlalchemy import Column, String, Float, Text, DateTime
 
 class Place(Base):
@@ -18,8 +19,8 @@ class Place(Base):
     _latitude = Column("latitude", Float, nullable=False)
     _longitude = Column("longitude", Float, nullable=False)
 
-    def __init__(self, title, description, price, latitude, longitude, owner_id):
-        if title is None or description is None or price is None or latitude is None or longitude is None or owner_id is None:
+    def __init__(self, title, description, price, latitude, longitude, owner):
+        if title is None or description is None or price is None or latitude is None or longitude is None or owner is None:
             raise ValueError("Required attributes not specified!")
 
         self.id = str(uuid.uuid4())
@@ -30,7 +31,7 @@ class Place(Base):
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.owner_id = owner_id # relationship - id of User who owns the Place
+        self.owner = owner
         self.reviews = []  # relationship - List to store related reviews
         self.amenities = []  # relationship - List to store related amenities
 
@@ -101,21 +102,17 @@ class Place(Base):
             raise ValueError("Invalid value specified for Longitude")
 
     @property
-    def owner_id(self):
-        """ Returns value of property owner_id """
-        return self._owner_id
+    def owner(self):
+        """ Returns value of property owner """
+        return self._owner
 
-    @owner_id.setter
-    def owner_id(self, value):
-        """Setter for prop owner_id"""
-        # calls the method in the facade object
-        from app.services import facade
-
-        owner_exists = facade.get_user(value)
-        if owner_exists:
-            self._owner_id = value
+    @owner.setter
+    def owner(self, value):
+        """Setter for prop owner"""
+        if isinstance(value, User):
+            self._owner = value
         else:
-            raise ValueError("Owner does not exist!")
+            raise ValueError("Invalid object type passed in for owner!")
 
     # --- Methods ---
     def save(self):

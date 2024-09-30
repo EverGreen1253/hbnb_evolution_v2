@@ -56,19 +56,36 @@ class PlaceList(Resource):
         places_data = api.payload
         wanted_keys_list = ['title', 'description', 'price', 'latitude', 'longitude', 'owner_id']
 
-        # Check whether the keys are present for price, latitude, longitude
+        # Check whether the keys are present
         if not all(name in wanted_keys_list for name in places_data):
             return { 'error': "Invalid input data" }, 400
+
+        # check that user exists
+        user = facade.get_user(str(places_data.get('owner_id')))
+        if not user:
+            return { 'error': "Invalid input data - user does not exist" }, 400
 
         # the try catch is here in case setter validation fails
         new_place = None
         try:
-            # I'm seriously confused if we're storing a user object in the owner slot or just the id
+            # NOTE: We're storing a user object in the owner slot and getting rid of owner_id
+            places_data['owner'] = user
+            del places_data['owner_id']
+
             new_place = facade.create_place(places_data)
         except ValueError as error:
             return { 'error': "Setter validation failure: {}".format(error) }, 400
 
-        return {'id': str(new_place.id), 'message': 'Place created successfully'}, 201
+        output = {
+            'id': str(new_place.id),
+            "title": new_place.title,
+            "description": new_place.description,
+            "price": new_place.price,
+            'latitude': new_place.latitude,
+            'longitude': new_place.longitude,
+            "owner_id": new_place.owner.id
+        }
+        return output, 201
 
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
@@ -134,11 +151,7 @@ class PlaceResource(Resource):
     @api.response(400, 'Setter validation failure')
     @api.response(404, 'Place not found')
     def put(self, place_id):
-        # curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>" -H "Content-Type: application/json" -d '{
-        # "title": "Not So Cozy Apartment",
-        # "description": "A terrible place to stay",
-        # "price": 999.99
-        # }'
+        # curl -X PUT "http://127.0.0.1:5000/api/v1/places/<place_id>" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{"title": "Not So Cozy Apartment","description": "A terrible place to stay","price": 999.99}'
 
         """Update a place's information"""
         place_data = api.payload
