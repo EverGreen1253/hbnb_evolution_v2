@@ -3,11 +3,14 @@ from app.persistence.repository import InMemoryRepository
 from app.persistence.user_repository import UserRepository
 
 facade = HBnBFacade()
+
+ADMIN_EMAIL = "admin@hbnb.io"
 admin_details = {
-    "first_name": "Super",
-    "last_name": "Admin",
-    "email": "super.admin@hbnb.com",
-    "password": "password",
+    # "id": "36c9050e-ddd3-4c3b-9731-9f487208bbc1",
+    "first_name": "Admin",
+    "last_name": "HBnB",
+    "email": ADMIN_EMAIL,
+    "password": "admin1234",
     "is_admin": True
 }
 
@@ -23,7 +26,7 @@ if isinstance(facade.user_repo, InMemoryRepository):
 # will persist across sessions.
 
 if isinstance(facade.user_repo, UserRepository):
-    result = facade.user_repo.get_user_by_email("super.admin@hbnb.com")
+    result = facade.user_repo.get_user_by_email(ADMIN_EMAIL)
 
     # If no Super Admin exists, create a new one
     if result is None:
