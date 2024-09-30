@@ -4,7 +4,16 @@ from app.persistence import Base
 import uuid
 from datetime import datetime
 from app.models.user import User
-from sqlalchemy import Column, String, Float, Text, DateTime
+from sqlalchemy import Column, String, Float, Text, DateTime, Table, ForeignKey
+from sqlalchemy.orm import relationship
+
+# define the many-to-many table
+place_amenity = Table(
+    'place_amenity',
+    Base.metadata,
+    Column('place_id', String(60), ForeignKey('places.id'), primary_key=True),
+    Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(Base):
     """ Place class """
@@ -18,6 +27,10 @@ class Place(Base):
     _price = Column("price", Float, nullable=False)
     _latitude = Column("latitude", Float, nullable=False)
     _longitude = Column("longitude", Float, nullable=False)
+    _owner_id = Column("user_id", String(60), ForeignKey('users.id'), nullable=False)
+    amenities_r = relationship("Amenity", secondary=place_amenity, back_populates = 'places_r')
+    reviews_r = relationship("Review", back_populates="place_r")
+    owner_r = relationship("User", back_populates="properties_r")
 
     def __init__(self, title, description, price, latitude, longitude, owner):
         if title is None or description is None or price is None or latitude is None or longitude is None or owner is None:

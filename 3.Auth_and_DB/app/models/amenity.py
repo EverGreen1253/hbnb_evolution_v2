@@ -3,7 +3,10 @@
 from app.persistence import Base
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Table, ForeignKey
+from sqlalchemy.orm import relationship
+from app.models.place import place_amenity
+
 
 class Amenity(Base):
     """ Amenity class """
@@ -13,6 +16,7 @@ class Amenity(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.now())
     updated_at = Column(DateTime, nullable=False, default=datetime.now())
     _name = Column("name", String(50), nullable=False)
+    places_r = relationship("Place", secondary=place_amenity, back_populates = 'amenities_r')
 
     def __init__(self, name):
         if name is None:

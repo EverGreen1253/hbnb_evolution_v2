@@ -114,10 +114,7 @@ class PlaceResource(Resource):
         if not place:
             return {'error': 'Place not found'}, 404
 
-        # This is going to be so cursed. If only there were a way to grab
-        # all the data without multiple function calls...
-
-        owner = facade.get_user(place.owner_id)
+        owner = place.owner
         if not owner:
             return {'error': 'Place owner not found'}, 404
 

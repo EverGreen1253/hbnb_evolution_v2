@@ -25,6 +25,8 @@ class User(Base):
     _email = Column("email", String(120), nullable=False, unique=True)
     _password = Column("password", String(128), nullable=False)
     _is_admin = Column("is_admin", Boolean, default=False)
+    reviews_r = relationship("Review", back_populates="user_r", cascade="delete, delete-orphan")
+    properties_r = relationship("Place", back_populates="owner_r", cascade="delete, delete-orphan")
 
     def __init__(self, first_name, last_name, email, password=None, is_admin = False):
         # NOTE: Attributes that don't already exist will be
