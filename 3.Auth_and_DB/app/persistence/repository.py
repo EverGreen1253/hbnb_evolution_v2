@@ -71,6 +71,7 @@ class SQLAlchemyRepository(Repository):
         # return self.model.query.get(obj_id)
 
     def get_all(self):
+        print(self.model)
         return db_session.query(self.model).all()
         # return self.model.query.all()
 

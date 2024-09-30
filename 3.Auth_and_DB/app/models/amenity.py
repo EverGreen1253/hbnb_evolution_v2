@@ -1,11 +1,18 @@
+""" Amenity model """
+
+from app.persistence import Base
 import uuid
 from datetime import datetime
+from sqlalchemy import Column, String, DateTime
 
-class Amenity:
-    # id = None
-    # name = ""
-    # created_at = None
-    # updated_at = None
+class Amenity(Base):
+    """ Amenity class """
+    __tablename__ = 'amenities'
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=False, default=datetime.now())
+    _name = Column("name", String(50), nullable=False)
 
     def __init__(self, name):
         if name is None:

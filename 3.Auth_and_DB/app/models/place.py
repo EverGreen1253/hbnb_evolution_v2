@@ -1,7 +1,23 @@
+""" Place model """
+
+from app.persistence import Base
 import uuid
 from datetime import datetime
+from sqlalchemy import Column, String, Float, Text, DateTime
 
-class Place:
+class Place(Base):
+    """ Place class """
+    __tablename__ = 'places'
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=False, default=datetime.now())
+    _title = Column("title", String(100), nullable=False)
+    _description = Column("description", Text, nullable=False)
+    _price = Column("price", Float, nullable=False)
+    _latitude = Column("latitude", Float, nullable=False)
+    _longitude = Column("longitude", Float, nullable=False)
+
     def __init__(self, title, description, price, latitude, longitude, owner_id):
         if title is None or description is None or price is None or latitude is None or longitude is None or owner_id is None:
             raise ValueError("Required attributes not specified!")

@@ -15,7 +15,7 @@ class User(Base):
     __tablename__ = 'users'
 
     # Remember: if you have getters & setters for any of the attributes
-    # you can't use the same name for the attirbutes themselves
+    # you can't use the same name for the attributes themselves
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     created_at = Column(DateTime, nullable=False, default=datetime.now())
