@@ -156,3 +156,36 @@ class UserResource(Resource):
             return {'message': 'User updated successfully'}, 200
 
         return {'error': 'User not found'}, 404
+
+
+# Example endpoint to show how to use relationships
+# I'm calling it UserRelations because I can't think of a better name
+@api.route('/<user_id>/places/')
+class UserRelations(Resource):
+    @api.response(200, 'Place details retrieved successfully')
+    @api.response(404, 'Place owner data not found')
+    def get(self, user_id):
+        # Log in as Admin
+        # curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "admin@hbnb.io", "password": "admin1234" }'
+
+        # Create a property
+        # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{"title": "Cozy Apartment","description": "A nice place to stay","price": 100.0,"latitude": 37.7749,"longitude": -122.4194}'
+
+        # Call the endpoint to see how the model relation extracts the Places data through the User model
+        # curl -X GET http://localhost:5000/api/v1/users/<user_id>/places/
+
+        """Get user's owned properties details by user ID"""
+        all_places = facade.get_user_places(user_id)
+        if not all_places:
+            return {'error': 'The specified User does not own any Places'}, 404
+
+        output = []
+        for place in all_places:
+            output.append({
+                'id': str(place.id),
+                'title': place.title,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+            })
+
+        return output, 200

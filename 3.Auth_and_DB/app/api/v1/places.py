@@ -80,9 +80,10 @@ class PlaceList(Resource):
         # the try catch is here in case setter validation fails
         new_place = None
         try:
+            # We don't need this for DB storage...
             # NOTE: We're storing a user object in the owner slot and getting rid of owner_id
-            places_data['owner'] = user
-            del places_data['owner_id']
+            # places_data['owner'] = user
+            # del places_data['owner_id']
 
             new_place = facade.create_place(places_data)
         except ValueError as error:
@@ -95,7 +96,7 @@ class PlaceList(Resource):
             "price": new_place.price,
             'latitude': new_place.latitude,
             'longitude': new_place.longitude,
-            "owner_id": new_place.owner.id
+            "owner_id": new_place.owner_id
         }
         return output, 201
 

@@ -26,7 +26,7 @@ class HBnBFacade:
         return self.user_repo.get(user_id)
 
     def get_user_by_email(self, email):
-        return self.user_repo.get_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def get_all_users(self):
         return self.user_repo.get_all()
@@ -34,6 +34,11 @@ class HBnBFacade:
     def update_user(self, user_id, user_data):
         self.user_repo.update(user_id, user_data)
 
+    def get_user_places(self, user_id):
+        owner = self.user_repo.get(user_id)
+
+        # Note that we make use of the relationship to extract data
+        return owner.properties_r
 
     # --- Amenities ---
     # Used during record insertion to prevent duplicate amenities

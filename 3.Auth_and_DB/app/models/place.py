@@ -27,13 +27,13 @@ class Place(Base):
     _price = Column("price", Float, nullable=False)
     _latitude = Column("latitude", Float, nullable=False)
     _longitude = Column("longitude", Float, nullable=False)
-    _owner_id = Column("user_id", String(60), ForeignKey('users.id'), nullable=False)
+    _owner_id = Column("owner_id", String(60), ForeignKey('users.id'), nullable=False)
     amenities_r = relationship("Amenity", secondary=place_amenity, back_populates = 'places_r')
     reviews_r = relationship("Review", back_populates="place_r")
     owner_r = relationship("User", back_populates="properties_r")
 
-    def __init__(self, title, description, price, latitude, longitude, owner):
-        if title is None or description is None or price is None or latitude is None or longitude is None or owner is None:
+    def __init__(self, title, description, price, latitude, longitude, owner_id):
+        if title is None or description is None or price is None or latitude is None or longitude is None or owner_id is None:
             raise ValueError("Required attributes not specified!")
 
         self.id = str(uuid.uuid4())
@@ -44,7 +44,7 @@ class Place(Base):
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.owner = owner
+        self.owner_id = owner_id
         self.reviews = []  # relationship - List to store related reviews
         self.amenities = []  # relationship - List to store related amenities
 
@@ -115,17 +115,14 @@ class Place(Base):
             raise ValueError("Invalid value specified for Longitude")
 
     @property
-    def owner(self):
+    def owner_id(self):
         """ Returns value of property owner """
-        return self._owner
+        return self._owner_id
 
-    @owner.setter
-    def owner(self, value):
+    @owner_id.setter
+    def owner_id(self, value):
         """Setter for prop owner"""
-        if isinstance(value, User):
-            self._owner = value
-        else:
-            raise ValueError("Invalid object type passed in for owner!")
+        self._owner_id = value
 
     # --- Methods ---
     def save(self):
