@@ -35,4 +35,4 @@ if isinstance(facade.user_repo, UserRepository):
     #     print('Super Admin user already exists. Moving on...')
 
 # With this default admin, we now will be able to log into the system to create more users.
-# curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "super.admin@hbnb.com", "password": "password" }'
+# curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "admin@hbnb.io", "password": "admin1234" }'
