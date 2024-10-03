@@ -155,30 +155,32 @@ class ReviewResource(Resource):
 
         return {'message': 'Review deleted successfully'}, 200
 
-@api.route('/places/<place_id>/reviews')
-class PlaceReviewList(Resource):
-    @api.response(200, 'List of reviews for the place retrieved successfully')
-    @api.response(404, 'Place not found')
-    def get(self, place_id):
-        """Get all reviews for a specific place"""
-        # I'm going to do this the worst possible way:
-        # 1. grab all the reviews records (lol)
-        # 2. iterate them all through a loop while searching for the place_id
-        # 3. save the ones with the place_id in an array
-        # 4. print it out
+# NOTE: This endpoint can be redone using model relationships.
+# It is now found in api/v1/places.py
+# @api.route('/places/<place_id>/reviews')
+# class PlaceReviewList(Resource):
+#     @api.response(200, 'List of reviews for the place retrieved successfully')
+#     @api.response(404, 'Place not found')
+#     def get(self, place_id):
+#         """Get all reviews for a specific place"""
+#         # I'm going to do this the worst possible way:
+#         # 1. grab all the reviews records (lol)
+#         # 2. iterate them all through a loop while searching for the place_id
+#         # 3. save the ones with the place_id in an array
+#         # 4. print it out
 
-        all_reviews = facade.get_all_reviews()
-        output = []
+#         all_reviews = facade.get_all_reviews()
+#         output = []
 
-        for review in all_reviews:
-            if review.place_id == place_id:
-                output.append({
-                    'id': str(review.id),
-                    'text': review.text,
-                    'rating': review.rating
-                })
+#         for review in all_reviews:
+#             if review.place_id == place_id:
+#                 output.append({
+#                     'id': str(review.id),
+#                     'text': review.text,
+#                     'rating': review.rating
+#                 })
 
-        if len(output) == 0:
-            return { 'error': "Place not found" }, 400
+#         if len(output) == 0:
+#             return { 'error': "Place not found" }, 400
 
-        return output, 200
+#         return output, 200

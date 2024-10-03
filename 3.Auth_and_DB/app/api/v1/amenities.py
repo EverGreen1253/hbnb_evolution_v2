@@ -20,10 +20,14 @@ class AmenityList(Resource):
     @api.response(400, 'Invalid input data')
     @api.response(400, 'Setter validation failure')
     @api.response(403, 'Admin privileges required')
+    @jwt_required()
     def post(self):
+        # Create the amenity
+        # curl -X POST "http://127.0.0.1:5000/api/v1/amenities/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "name": "Wi-Fi"}'
+
         """Register a new amenity"""
         claims = get_jwt()
-        if not claims['is_admin']:
+        if not claims.get('is_admin', True):
             return {'error': 'Admin privileges required'}, 403
 
         amenity_data = api.payload
@@ -87,7 +91,7 @@ class AmenityResource(Resource):
     def put(self, amenity_id):
         """Update an amenity's information"""
         claims = get_jwt()
-        if not claims['is_admin']:
+        if not claims.get('is_admin', True):
             return {'error': 'Admin privileges required'}, 403
 
         amenity_data = api.payload

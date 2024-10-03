@@ -158,34 +158,74 @@ class UserResource(Resource):
         return {'error': 'User not found'}, 404
 
 
-# Example endpoint to show how to use relationships
+# Example endpoints to show how to use relationships
 # I'm calling it UserRelations because I can't think of a better name
-@api.route('/<user_id>/places/')
+@api.route('/<user_id>/<relation>/')
 class UserRelations(Resource):
-    @api.response(200, 'Place details retrieved successfully')
-    @api.response(404, 'Place owner data not found')
-    def get(self, user_id):
-        # Log in as Admin
-        # curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "admin@hbnb.io", "password": "admin1234" }'
-
-        # Create a property
-        # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{"title": "Cozy Apartment","description": "A nice place to stay","price": 100.0,"latitude": 37.7749,"longitude": -122.4194}'
-
-        # Call the endpoint to see how the model relation extracts the Places data through the User model
-        # curl -X GET http://localhost:5000/api/v1/users/<user_id>/places/
-
-        """Get user's owned properties details by user ID"""
-        all_places = facade.get_user_places(user_id)
-        if not all_places:
-            return {'error': 'The specified User does not own any Places'}, 404
+    @api.response(404, 'Unable to retrieve Places owned by specified user')
+    @api.response(404, 'Unable to retrieve Reviews written by specified user')
+    def get(self, user_id, relation):
+        """
+        Depending on the term used in <relation>, we either retrieve 
+        the Places owned by the User, or the Reviews they wrote
+        """
 
         output = []
-        for place in all_places:
-            output.append({
-                'id': str(place.id),
-                'title': place.title,
-                'latitude': place.latitude,
-                'longitude': place.longitude,
-            })
+
+        # === PLACES ===
+        if relation == "places":
+            # Log in as Admin
+            # curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "admin@hbnb.io", "password": "admin1234" }'
+
+            # Create a property using Admin's token (if one doesn't already exist in the DB)
+            # curl -X POST "http://127.0.0.1:5000/api/v1/places/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{"title": "Cozy Apartment","description": "A nice place to stay","price": 100.0,"latitude": 37.7749,"longitude": -122.4194}'
+
+            # Call the endpoint to see how the model relation extracts the Places data through the User model
+            # curl -X GET http://localhost:5000/api/v1/users/<user_id>/places/
+
+            all_places = facade.get_user_places(user_id)
+            if not all_places:
+                return {'error': 'Unable to retrieve Places owned by specified user'}, 404
+
+            for place in all_places:
+                output.append({
+                    'id': str(place.id),
+                    'title': place.title,
+                    'latitude': place.latitude,
+                    'longitude': place.longitude,
+                })
+
+
+        # === REVIEWS ===
+        if relation == "reviews":
+            # NOTE: You can't review a place you own
+
+            # Log in as Admin to get usable token
+            # curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "admin@hbnb.io", "password": "admin1234" }'
+
+            # Create the Reviewer
+            # curl -X POST "http://127.0.0.1:5000/api/v1/users/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "first_name": "John", "last_name": "Doe", "email": "john.doe@example.com", "password": "cowabunga", "is_admin": true}'
+
+            # Log in as Reviewer
+            # curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "john.doe@example.com", "password": "cowabunga" }'
+
+            # Write a review about a place (that the reviewer doesn't own)
+            # curl -X POST "http://127.0.0.1:5000/api/v1/reviews/" -H "Content-Type: application/json" -H "Authorization: Bearer <token_goes_here>" -d '{ "text": "Very dirty", "rating": 1, "place_id": "<place_id_goes_here>" }'
+
+            # Call the endpoint to see how the model relation extracts the Reviews data through the User model
+            # curl -X GET http://localhost:5000/api/v1/users/<user_id>/reviews/
+
+            all_reviews = facade.get_user_reviews(user_id)
+            if not all_reviews:
+                return {'error': 'Unable to retrieve Reviews written by specified user'}, 404
+
+            for review in all_reviews:
+                output.append({
+                    'id': str(review.id),
+                    'text': review.text,
+                    'rating': review.rating,
+                    'user_id': review.user_id,
+                    'place_id': review.place_id,
+                })
 
         return output, 200

@@ -192,3 +192,67 @@ class PlaceResource(Resource):
             return {'message': 'Place updated successfully'}, 200
 
         return {'error': 'Place not found'}, 404
+
+# Example endpoints to show how to use relationships
+@api.route('/<place_id>/<relation>/')
+class PlaceRelations(Resource):
+    @api.response(404, 'Unable to retrieve Amenities linked to this property')
+    @api.response(404, 'Unable to retrieve Reviews written about this place')
+    @api.response(404, 'Unable to retrieve Owner details for this property')
+    def get(self, place_id, relation):
+        """
+        Depending on the term used in <relation>, we either retrieve 
+        the owner User of the Place, or the Reviews for it
+        """
+
+        output = []
+
+        # === AMENITIES ===
+        if relation == "amenities":
+            # Manually add the place_id-to-amenity_id records in the DB. This is the fastest way to do it.
+
+            # Get the list of amenities that can be found in this place
+            # curl -X GET http://localhost:5000/api/v1/places/<place_id>/amenities/
+            all_amenities = facade.get_place_amenities(place_id)
+            if not all_amenities:
+                return {'error': 'Unable to retrieve Amenities linked to this property'}, 404
+
+            for amenity in all_amenities:
+                output.append({
+                    'id': str(amenity.id),
+                    'name': amenity.name
+                })
+
+        # === REVIEWS ===
+        if relation == "reviews":
+            # Get the list of reviews written about this place
+            # curl -X GET http://localhost:5000/api/v1/places/<place_id>/reviews/
+
+            all_reviews = facade.get_place_reviews(place_id)
+            if not all_reviews:
+                return {'error': 'Unable to retrieve Reviews written about this place'}, 404
+
+            for review in all_reviews:
+                output.append({
+                    'id': str(review.id),
+                    'text': review.text,
+                    'rating': review.rating
+                })
+
+        # === OWNER ===
+        if relation == "owner":
+            # Get the details of the owner of this place
+            # curl -X GET http://localhost:5000/api/v1/places/<place_id>/owner/
+
+            owner = facade.get_place_owner(place_id)
+            if not owner:
+                return {'error': 'Unable to retrieve Owner details for this property'}, 404
+
+            output = {
+                'id': str(owner.id),
+                'first_name': owner.first_name,
+                'last_name': owner.last_name,
+                'email': owner.email
+            }
+
+        return output, 200
