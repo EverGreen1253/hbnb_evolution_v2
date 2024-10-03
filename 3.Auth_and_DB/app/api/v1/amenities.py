@@ -112,3 +112,32 @@ class AmenityResource(Resource):
             return {'message': 'Amenity updated successfully'}, 200
 
         return {'error': 'Amenity not found'}, 404
+
+# Example endpoints to show how to use relationships
+@api.route('/<amenity_id>/<relation>/')
+class AmenityRelations(Resource):
+    @api.response(404, 'Unable to retrieve Places using this Amenity')
+    def get(self, amenity_id, relation):
+        """
+        Only one endpoint for now, to get the places using the specified amenity
+        """
+
+        output = []
+
+        # === PLACES ===
+        # curl -X GET http://localhost:5000/api/v1/amenities/<amenity_id>/places/
+
+        if relation == "places":
+            all_places = facade.get_places_with_specific_amenity(amenity_id)
+            if not all_places:
+                return {'error': 'Unable to retrieve Places using this Amenity'}, 404
+
+            for place in all_places:
+                output.append({
+                    'id': str(place.id),
+                    'title': place.title,
+                    'latitude': place.latitude,
+                    'longitude': place.longitude,
+                })
+
+        return output, 200

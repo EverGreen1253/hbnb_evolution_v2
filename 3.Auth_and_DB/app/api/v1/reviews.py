@@ -184,3 +184,50 @@ class ReviewResource(Resource):
 #             return { 'error': "Place not found" }, 400
 
 #         return output, 200
+
+# Example endpoints to show how to use relationships
+@api.route('/<review_id>/<relation>/')
+class ReviewRelations(Resource):
+    @api.response(404, 'Unable to retrieve Writer details for this Review')
+    @api.response(404, 'Unable to retrieve Place linked to this Review')
+    def get(self, review_id, relation):
+        """
+        Depending on the term used in <relation>, we either retrieve 
+        the writer the Review, or Place associated with it
+        """
+
+        output = []
+
+        # === WRITER ===
+        if relation == "writer":
+            # Get the details of the owner of this place
+            # curl -X GET http://localhost:5000/api/v1/reviews/<review_id>/writer/
+
+            writer = facade.get_review_writer(review_id)
+            if not writer:
+                return {'error': 'Unable to retrieve Writer details for this Review'}, 404
+
+            output = {
+                'id': str(writer.id),
+                'first_name': writer.first_name,
+                'last_name': writer.last_name,
+                'email': writer.email
+            }
+
+        # === PLACES ===
+        if relation == "place":
+            # Get the details of the owner of this place
+            # curl -X GET http://localhost:5000/api/v1/reviews/<review_id>/place/
+
+            place = facade.get_reviewed_place(review_id)
+            if not place:
+                return {'error': 'Unable to retrieve Place linked to this Review'}, 404
+
+            output = {
+                'id': str(place.id),
+                'title': place.title,
+                'latitude': place.latitude,
+                'longitude': place.longitude,
+            }
+
+        return output, 200
