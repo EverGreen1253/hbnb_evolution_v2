@@ -3,30 +3,55 @@
   You'll probably need to override some of theese styles.
 */
 
-* {
+html {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    font-size: 10px;
 }
 
 body {
     background-color: #f4f4f4;
     color: #333;
+    padding: 0;
+    margin: 0;
+    font-size: 1.4rem;
 }
 
 header {
-    background-color: #333;
+    background-image: url(images/logo.png);
+    background-repeat: no-repeat;
+    background-size: auto 40px;
+    background-position: 10px center;
+    background-color: orange;
     color: #fff;
-    padding: 1rem;
+    padding: 15px 10px;
+    text-align: right;
 }
 
 nav a {
     color: #fff;
     text-decoration: none;
-    margin-left: 1rem;
+    padding: 7px 20px;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+    background-color: rgba(0,0,0,0.1);
+}
+
+nav a:hover {
+    background-color: rgba(0,0,0,0.25);
 }
 
 main {
-    padding: 2rem;
+    padding: 20px;
+}
+
+footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    background-color: orange;
+    text-align: center;
+    padding: 10px;
 }
