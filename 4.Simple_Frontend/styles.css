@@ -56,7 +56,14 @@ nav a:hover {
 }
 
 main {
-    padding: 20px;
+    padding: 10px;
+}
+
+#filter {
+    background-color: #E5E5E5;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 3px;
 }
 
 #loader {
@@ -76,6 +83,54 @@ main {
     background-position: center 10px;
     padding-bottom: 10px;
     box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+}
+
+#loader.hide {
+    display: none;
+}
+
+#places-list ul.cards, #places-list li.card {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#places-list li.card {
+    padding: 10px 5px 5px 5px;
+    margin: 0 5px;
+    border: 1px solid #999;
+    width: calc(24.9% - 20px);
+    border-radius: 3px;
+    background-color: #E5E5E5;
+    box-shadow: 3px 3px 3px rgba(0,0,0,0.1);
+}
+
+#places-list li.card .title {
+    font-weight: bold;
+    font-size: 1.8rem;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+#places-list li.card .details .image {
+    height: 180px;
+    background-image: url(images/house.jpeg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 10px;
+
+}
+
+#places-list li.card .details .desc {
+    margin-bottom: 10px;
+}
+
+#places-list li.card .details .coords {
+    text-align: right;
+    font-size: 1rem;
+    background-color: #CCC;
+    padding: 3px;
 }
 
 footer {
