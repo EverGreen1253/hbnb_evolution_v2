@@ -31,6 +31,57 @@ body {
     justify-content: center;
 }
 
+#loader {
+    position: fixed;
+    left: calc(50% - 120px);
+    top: calc(50% - 50px);
+    width: 240px;
+    height: 100px;
+    border: 1px solid #CCC;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-radius: 10px;
+    background-color: #FFF;
+    background-image: url(images/loader.gif);
+    background-repeat: no-repeat;
+    background-position: center 10px;
+    padding-bottom: 10px;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+}
+
+#loader.hide {
+    display: none;
+}
+
+#error {
+    position: fixed;
+    left: calc(50% - 120px);
+    top: calc(50% - 50px);
+    width: 240px;
+    height: 100px;
+    border: 1px solid #000;
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #FFF;
+    background-image: url(images/alert.png);
+    background-size: 50px auto;
+    background-repeat: no-repeat;
+    background-position: center 10px;
+    padding-bottom: 10px;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+}
+
+#error.hide {
+    display: none;
+}
+
+#error.show {
+    display: flex;
+}
+
 header {
     background-image: url(images/logo.png);
     background-repeat: no-repeat;
@@ -66,29 +117,6 @@ main {
     border-radius: 3px;
 }
 
-#loader {
-    position: fixed;
-    left: calc(50% - 120px);
-    top: calc(50% - 50px);
-    width: 240px;
-    height: 100px;
-    border: 1px solid #CCC;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    border-radius: 10px;
-    background-color: #FFF;
-    background-image: url(images/loader.gif);
-    background-repeat: no-repeat;
-    background-position: center 10px;
-    padding-bottom: 10px;
-    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
-}
-
-#loader.hide {
-    display: none;
-}
-
 #places-list ul.cards, #places-list li.card {
     list-style: none;
     margin: 0;
@@ -103,6 +131,7 @@ main {
     border-radius: 3px;
     background-color: #E5E5E5;
     box-shadow: 3px 3px 3px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 #places-list li.card .title {
@@ -113,17 +142,27 @@ main {
     margin-bottom: 5px;
 }
 
+#places-list li.card .price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.8rem;
+}
+
 #places-list li.card .details .image {
     height: 180px;
     background-image: url(images/house.jpeg);
     background-repeat: no-repeat;
     background-size: cover;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 
 }
 
 #places-list li.card .details .desc {
-    margin-bottom: 10px;
+    padding: 10px;
+    margin-bottom: 5px;
+    font-size: 1.4rem;
+    background-color: #CCC;
 }
 
 #places-list li.card .details .coords {
