@@ -54,19 +54,25 @@ hbnb = {
             console.log(place)
             // NOTE: Consider storing the HTML below elsewhere instead of within this function
             // e.g. hbnb.html.places.card
+            amenities_spans = ``
+            if (place.amenities.length > 0) {
+                for (let amenity of place.amenities) {
+                    amenities_spans += `<span class="` + amenity.toLowerCase() + `"></span>`
+                }
+            }
+
             cardsListTag.innerHTML += `
                 <li class="card">
                     <div>
                         <div class="title">` + place.title + `</div>
                         <div class="price">$` + place.price + `</div>
-                        <div class="details">
-                            <div class="image"></div>
-                            <div class="desc">` + place.description + `</div>
-                            <div class="coords">
-                                <span><b>Lat: </b>` + place.latitude + `</span>
-                                <span><b>Lon: </b>` + place.longitude + `</span>
-                            </div>
+                        <div class="image"></div>
+                        <div class="desc">` + place.description + `</div>
+                        <div class="coords">
+                            <span><b>Lat: </b>` + place.latitude + `</span>
+                            <span><b>Lon: </b>` + place.longitude + `</span>
                         </div>
+                        <div class="amenities">` + amenities_spans + `</div>
                     <div>
                 </li>
             `;

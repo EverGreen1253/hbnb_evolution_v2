@@ -107,13 +107,22 @@ class PlaceList(Resource):
         output = []
 
         for place in all_places:
+            # For Part 4: What if we want to include the amenities of each place in the output?
+            amenities_list = []
+            all_amenities = facade.get_place_amenities(place.id)
+            for amenity in all_amenities:
+                amenities_list.append(amenity.name)
+
             output.append({
                 'id': str(place.id),
                 'title': place.title,
                 'latitude': place.latitude,
                 'longitude': place.longitude,
+
+                # For Part 4: additional data needed for Place listing Card
                 'description': place.description,
-                'price': place.price
+                'price': place.price,
+                'amenities': amenities_list
             })
 
         return output, 200
