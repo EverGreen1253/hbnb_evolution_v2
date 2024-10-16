@@ -3,7 +3,7 @@ hbnb = {
     "msg": {
         "error": {
             "api": {
-                "places": "Unable to connect to Places API. Please ensure the server is active."
+                "places": "Unable to connect to Places API. Please ensure the server is active.",
             }
         }
     },
@@ -77,11 +77,45 @@ hbnb = {
                 </li>
             `;
         }
-  },
-  init: function() {
-    // 1. Load Places data by calling the API
-    hbnb.placesLoad()
-  }
+    },
+    filterPriceOptionsPopulate: function() {
+        let options = [50, 100, 250, 500]
+        let selectElem = document.querySelector("#filter li.price select")
+
+        for (let option of options) {
+            selectElem.innerHTML += `
+                <option value="` + option + `">
+                    $` + option.toString() + `
+                </option>
+            `;
+        }
+    },
+    filterAmenityPopulate: function() {
+        amenities = ["Wi-Fi", "Toilet", "Shower", "Air Con"]
+        let checkboxesHolder = document.querySelector("#filter li.amenities .choices")
+        for (let amenity of amenities) {
+            checkboxesHolder.innerHTML += `
+                <li>
+                    <label>
+                        <input type="checkbox" value="` + amenity.toLowerCase() + `" />
+                        <span>` + amenity + `</span>
+                    </label>
+                </li>
+            `;
+        }
+    },
+    init: function() {
+        // 1. Init the filter options
+        hbnb.filterPriceOptionsPopulate()
+        hbnb.filterAmenityPopulate()
+
+        // 2. Load Places data by calling the API
+        hbnb.placesLoad()
+
+        // NOTE: I tried loading the amenities via a Promise and that resulted in
+        // it fighting with the Promise used to load the Places. The server died as
+        // a result. lol
+    }
 }
 
 window.onload = function() {

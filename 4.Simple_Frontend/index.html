@@ -23,10 +23,30 @@
     </header>
     <main>
         <section id="filter">
-            <label for="price-filter">Max Price:</label>
-            <select id="price-filter">
-                <!-- Options will be populated dynamically -->
-            </select>
+            <div class="title">Property filters</div>
+            <ul>
+                <li class="name">
+                    <label>
+                        <span>Name:</span>
+                        <input name="filter-name" type="text" value="" maxlength="20" />
+                    </label>
+                </li>
+                <li class="price">
+                    <label>Max Price:</label>
+                    <select name="filter-price">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </li>
+                <li class="amenities">
+                    <label>Amenities:</label>
+                    <ul class="choices">
+                        <!-- Labeled checkboxes will be populated dynamically -->
+                    </ul>
+                </li>
+                <li class="search">
+                    <button id="search">Search</button>
+                </li>
+            </ul>
         </section>
         <section id="places-list">
             <ul class="cards">
