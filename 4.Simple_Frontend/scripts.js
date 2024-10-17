@@ -1,12 +1,20 @@
 
 hbnb = {
+    // storage area for data obtained from API calls
+    "data": {
+        "places": [],
+        "amenities": []
+    },
+
+    // messages to be displayed in website. e.g. errors, notifications, etc
     "msg": {
         "error": {
             "api": {
-                "places": "Unable to connect to Places API. Please ensure the server is active.",
+                "generic": "Unable to retrieve API data. Please ensure the server is active.",
             }
         }
     },
+
     showError: function(msg) {
         document.getElementById("error").innerHTML = msg
         document.getElementById("error").setAttribute('class', 'show');
@@ -14,44 +22,29 @@ hbnb = {
     hideLoader: function() {
         document.getElementById("loader").setAttribute('class', 'hide');
     },
-    placesLoad: function() {
-        let apiErrorHappened = false
-        const url = "http://localhost:5000/api/v1/places/";
+    // general function used to load data for Places + Amenities
+    loadData: async function() {
+        const placesUrl = "http://localhost:5000/api/v1/places/";
+        const amenitiesUrl = "http://localhost:5000/api/v1/amenities/";
 
-        const placesPromise = new Promise((resolve, reject) => {
-            try {
-                const response = fetch(url);
-                response.then((result) => {
-                    resolve(result.json());
-                }).catch((e) => {
-                    // console.error(e)
-                    hbnb.showError(hbnb.msg.error.api.places)
-                    hbnb.hideLoader()
-                    apiErrorHappened = true
-                })
-            } catch(error) {
-                console.error("Error:", error);
-                reject('Unable to fetch Places data');
-            }
-        });
+        try {
+            const placesResponse = await fetch(placesUrl);
+            const amenitiesResponse = await fetch(amenitiesUrl);
 
-        if (!apiErrorHappened) {
-            placesPromise.then((result) => {
-                hbnb.placesPopulate(result)
-            }).catch((e) => {
-                // console.error(e)
-                hbnb.showError(hbnb.msg.error.api.places)
-            }).finally(() => {
-                hbnb.hideLoader()
-            })
+            // Store the data I got from the async API calls
+            hbnb.data.places = await placesResponse.json()
+            hbnb.data.amenities = await amenitiesResponse.json()
+        } catch(error) {
+            // console.error("Error:", error);
+            hbnb.showError(hbnb.msg.error.api.generic)
+            throw new Error(error);
         }
     },
-    placesPopulate: function(data) {
+    placesPopulate: function() {
         const cardsListTag = document.querySelector("#places-list > .cards")
 
         // Use innerHTML to add the HTML content to the page
-        for (let place of data) {
-            console.log(place)
+        for (let place of hbnb.data.places) {
             // NOTE: Consider storing the HTML below elsewhere instead of within this function
             // e.g. hbnb.html.places.card
             amenities_spans = ``
@@ -90,31 +83,34 @@ hbnb = {
             `;
         }
     },
-    filterAmenityPopulate: function() {
-        amenities = ["Wi-Fi", "Toilet", "Shower", "Air Con"]
+    filterAmenityCheckboxesPopulate: function() {
         let checkboxesHolder = document.querySelector("#filter li.amenities .choices")
-        for (let amenity of amenities) {
+        for (let amenity of hbnb.data.amenities) {
             checkboxesHolder.innerHTML += `
                 <li>
                     <label>
-                        <input type="checkbox" value="` + amenity.toLowerCase() + `" />
-                        <span>` + amenity + `</span>
+                        <input type="checkbox" value="` + amenity.name.toLowerCase() + `" />
+                        <span>` + amenity.name + `</span>
                     </label>
                 </li>
             `;
         }
     },
     init: function() {
-        // 1. Init the filter options
-        hbnb.filterPriceOptionsPopulate()
-        hbnb.filterAmenityPopulate()
+        // 1. Load data for Amenities + Places
+        hbnb.loadData().then(() => {
+            // 2. Populate filter with data
+            hbnb.filterAmenityCheckboxesPopulate()
+            hbnb.filterPriceOptionsPopulate()
 
-        // 2. Load Places data by calling the API
-        hbnb.placesLoad()
-
-        // NOTE: I tried loading the amenities via a Promise and that resulted in
-        // it fighting with the Promise used to load the Places. The server died as
-        // a result. lol
+            // 3. Add Places data to website DOM
+            hbnb.placesPopulate()
+        }).catch((e) => {
+            console.error(e)
+        }).finally(() => {
+            // Hide the loader
+            hbnb.hideLoader()
+        })
     }
 }
 
