@@ -22,8 +22,9 @@ hbnb = {
     hideLoader: function() {
         document.getElementById("loader").setAttribute('class', 'hide');
     },
-    // general function used to load data for Places + Amenities
-    loadData: async function() {
+
+    // general function used to load Places + Amenities data for Index page
+    loadIndexData: async function() {
         const placesUrl = "http://localhost:5000/api/v1/places/";
         const amenitiesUrl = "http://localhost:5000/api/v1/amenities/";
 
@@ -84,7 +85,7 @@ hbnb = {
         }
     },
     filterAmenityCheckboxesPopulate: function() {
-        let checkboxesHolder = document.querySelector("#filter li.amenities .choices")
+        let checkboxesHolder = document.querySelector("#filter li.amenities .filter-amenities")
         for (let amenity of hbnb.data.amenities) {
             checkboxesHolder.innerHTML += `
                 <li>
@@ -96,21 +97,85 @@ hbnb = {
             `;
         }
     },
-    init: function() {
-        // 1. Load data for Amenities + Places
-        hbnb.loadData().then(() => {
-            // 2. Populate filter with data
-            hbnb.filterAmenityCheckboxesPopulate()
-            hbnb.filterPriceOptionsPopulate()
+    filterSearchInit: function() {
+        const searchBtn = document.getElementById('search');
+        searchBtn.addEventListener('click', function() {
+            // Assemble the filter options
+            const name = document.querySelector("#filter .filter-name")
+            const price = document.querySelector("#filter .filter-price")
+            const amenities = document.querySelectorAll("#filter .filter-amenities input")
 
-            // 3. Add Places data to website DOM
-            hbnb.placesPopulate()
-        }).catch((e) => {
-            console.error(e)
-        }).finally(() => {
-            // Hide the loader
-            hbnb.hideLoader()
+            let amenitiesList = []
+            for (let amenity of amenities) {
+                if (amenity.checked) {
+                    amenitiesList.push(amenity.value)
+                }
+            }
+
+            let data = {
+                "name": name.value,
+                "price": price.value,
+                "amenities": amenitiesList
+            }
+            console.log(data)
+
+            // FIXME:
+            const searchURL = "http://localhost:5000/api/v1/places/search";
+            fetch(searchURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then((json) => {
+                console.log(json)
+            }).catch((e) => {
+                console.error(e)
+            }).finally(() => {
+                console.log('search submitted!')
+            })
         })
+    },
+    filterSearchAction: function() {
+
+    },
+
+    init: function() {
+        const pageId = document.getElementsByTagName('body')[0].getAttribute('page-id')
+
+        switch(pageId) {
+            case 'index':
+                // 1. Load data for Amenities + Places
+                hbnb.loadIndexData()
+                .then(() => {
+                    // 2. Populate filter with data
+                    hbnb.filterAmenityCheckboxesPopulate()
+                    hbnb.filterPriceOptionsPopulate()
+
+                    // 3. Add Places data to website DOM
+                    hbnb.placesPopulate()
+
+                    // 4. Prepare the filter
+                    hbnb.filterSearchInit()
+                }).catch((e) => {
+                    console.error(e)
+                }).finally(() => {
+                    // Hide the loader
+                    hbnb.hideLoader()
+                })
+                break;
+            case 'login':
+                // TODO:
+                break;
+            case 'place':
+                // TODO:
+                break;
+            case 'add_review':
+                // TODO:
+                break;
+        }
     }
 }
 

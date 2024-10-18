@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="images/icon.png" />
 </head>
-<body>
+<body page-id="index">
     <noscript>
         <div class="no-js">
             Please enable Javascript!
@@ -28,18 +28,19 @@
                 <li class="name">
                     <label>
                         <span>Name:</span>
-                        <input name="filter-name" type="text" value="" maxlength="20" />
+                        <input class="filter-name" name="filter-name" type="text" value="" maxlength="20" />
                     </label>
                 </li>
                 <li class="price">
                     <label>Max Price:</label>
-                    <select name="filter-price">
-                        <!-- Options will be populated dynamically -->
+                    <select class="filter-price" name="filter-price">
+                        <option value="0">Any</option>
+                        <!-- Other options will be populated dynamically -->
                     </select>
                 </li>
                 <li class="amenities">
                     <label>Amenities:</label>
-                    <ul class="choices">
+                    <ul class="filter-amenities">
                         <!-- Labeled checkboxes will be populated dynamically -->
                     </ul>
                 </li>

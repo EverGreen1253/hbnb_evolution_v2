@@ -267,3 +267,13 @@ class PlaceRelations(Resource):
             }
 
         return output, 200
+
+
+# The endpoint below is used only for Part 4
+@api.route('/search')
+class PlaceSearch(Resource):
+    @api.response(200, 'Search completed')
+    @api.response(400, 'Invalid input data')
+    def post(self):
+        # FIXME:
+        return 'HELLO WORLD', 200
