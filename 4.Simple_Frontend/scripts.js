@@ -119,7 +119,6 @@ hbnb = {
             }
             console.log(data)
 
-            // FIXME:
             const searchURL = "http://localhost:5000/api/v1/places/search";
             fetch(searchURL, {
                 method: "POST",
@@ -128,9 +127,15 @@ hbnb = {
                 },
                 body: JSON.stringify(data),
             })
-            .then(response => response.json())
-            .then((json) => {
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return response.json()
+            }).then((json) => {
                 console.log(json)
+                // FIXME: Depending on the response data, regenerate the Places shown
             }).catch((e) => {
                 console.error(e)
             }).finally(() => {

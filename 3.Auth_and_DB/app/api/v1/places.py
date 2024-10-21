@@ -275,5 +275,99 @@ class PlaceSearch(Resource):
     @api.response(200, 'Search completed')
     @api.response(400, 'Invalid input data')
     def post(self):
-        # FIXME:
-        return 'HELLO WORLD', 200
+        # Query the database based on the data passed in
+        # curl -X POST "http://127.0.0.1:5000/api/v1/places/search" -H "Content-Type: application/json" -d '{ "name": "cozy", "price": "250", "amenities": ["wi-fi", "toilet"]}'
+
+        # --- IMPORTS ---
+        from sqlalchemy import text
+        from app.persistence import db_session
+
+        search_data = api.payload
+        print(search_data)
+
+        name = search_data['name'].strip()
+        price = int(search_data['price'])
+        amenities = search_data['amenities']
+
+        # --- Example query ---
+        # SELECT * FROM (
+        #     SELECT p.*, GROUP_CONCAT(a.name) AS amenities
+        #     FROM places p
+        #     LEFT JOIN place_amenity pa ON p.id = pa.place_id
+        #     LEFT JOIN (
+        #         SELECT * FROM amenities
+        #         WHERE amenities.name IN ('wi-fi', 'toilet')
+        #     ) a ON pa.amenity_id  = a.id
+        #     GROUP BY p.id
+        # ) as x
+        # WHERE (title LIKE "%cozy%" OR description LIKE "%cozy%") AND (price >= 250)
+
+        where_clause = ""
+        and_clause = ""
+        name_conditions = ""
+        price_conditions = ""
+        amenities_condition = ""
+
+        if len(name) > 0:
+            # add WHERE clause
+            if where_clause == "":
+                where_clause = "WHERE "
+            name_conditions = "(title LIKE \"%" + name + "%\" OR description LIKE \"%" + name + "%\")"
+
+        if price > 0:
+            # add WHERE clause or AND clause
+            if where_clause == "":
+                where_clause = "WHERE "
+            else:
+                and_clause = "AND "
+            price_conditions = "(price >= " + str(price) + ")"
+
+        conditions = where_clause + name_conditions + and_clause + price_conditions
+
+        if len(amenities) > 0:
+            # Assemble the comma-separated list
+            # 1. wrap each item in the list with inverted commas
+            amenities_list = []
+            for a in amenities:
+                amenities_list.append("'" + a + "'")
+
+            # 2. then turn it into a comma separated string
+            amenities_comma_list = ",".join(amenities_list)
+            amenities_condition = "WHERE amenities.name IN (" + amenities_comma_list + ")"
+
+        query = "SELECT * FROM ( \
+            SELECT p.*, GROUP_CONCAT(a.name) AS amenities \
+            FROM places p \
+            LEFT JOIN place_amenity pa ON p.id = pa.place_id \
+            LEFT JOIN ( \
+                SELECT * FROM amenities \
+                " + amenities_condition + " \
+            ) a ON pa.amenity_id  = a.id \
+            GROUP BY p.id \
+        ) as x " + conditions
+
+        # print(query)
+
+        output = []
+        sql = text(query)
+        result = db_session.execute(sql)
+
+        # print(result)
+
+        for row in result:
+            amenities_array = []
+            if row.amenities:
+                amenities_array = row.amenities.split(",")
+
+            output.append({
+                "place_id": row.id,
+                "title": row.title,
+                "description": row.description,
+                "price": row.price,
+                "latitude": row.latitude,
+                "longitude": row.longitude,
+                "owner_id": row.owner_id,
+                "amenities": amenities_array
+            })
+
+        return output, 200
