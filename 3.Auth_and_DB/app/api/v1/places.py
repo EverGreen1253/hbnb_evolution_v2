@@ -283,7 +283,7 @@ class PlaceSearch(Resource):
         from app.persistence import db_session
 
         search_data = api.payload
-        print(search_data)
+        # print(search_data)
 
         name = search_data['name'].strip()
         price = int(search_data['price'])
@@ -307,6 +307,7 @@ class PlaceSearch(Resource):
         name_conditions = ""
         price_conditions = ""
         amenities_condition = ""
+        amenities_present_condition = ""
 
         if len(name) > 0:
             # add WHERE clause
@@ -322,8 +323,6 @@ class PlaceSearch(Resource):
                 and_clause = "AND "
             price_conditions = "(price >= " + str(price) + ")"
 
-        conditions = where_clause + name_conditions + and_clause + price_conditions
-
         if len(amenities) > 0:
             # Assemble the comma-separated list
             # 1. wrap each item in the list with inverted commas
@@ -334,6 +333,15 @@ class PlaceSearch(Resource):
             # 2. then turn it into a comma separated string
             amenities_comma_list = ",".join(amenities_list)
             amenities_condition = "WHERE amenities.name IN (" + amenities_comma_list + ")"
+
+            # 3. add a final clause in the WHERE
+            if where_clause == "":
+                where_clause = "WHERE "
+            else:
+                and_clause = "AND "
+            amenities_present_condition = "(amenities != '')"
+
+        conditions = where_clause + name_conditions + and_clause + price_conditions + amenities_present_condition
 
         query = "SELECT * FROM ( \
             SELECT p.*, GROUP_CONCAT(a.name) AS amenities \
