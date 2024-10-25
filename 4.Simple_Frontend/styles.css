@@ -183,10 +183,14 @@ main {
     cursor: pointer;
 }
 
+#places-list ul.cards {
+    display: flex;
+}
+
 #places-list li.card {
     min-width: 280px;
     padding: 10px 5px 5px 5px;
-    margin: 0 5px;
+    margin: 0 10px;
     border: 1px solid #999;
     width: calc(24.9% - 20px);
     border-radius: 3px;
@@ -256,6 +260,14 @@ main {
 
 #places-list li.card .amenities .toilet {
     background-image: url(images/icon_toilet.png);
+}
+
+#places-list li.card .amenities .shower {
+    background-image: url(images/icon_bath.png);
+}
+
+#places-list li.card .amenities .air-con {
+    background-image: url(images/icon_air-con.png);
 }
 
 footer {

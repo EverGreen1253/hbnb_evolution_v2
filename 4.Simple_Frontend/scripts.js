@@ -41,17 +41,17 @@ hbnb = {
             throw new Error(error);
         }
     },
-    placesPopulate: function() {
+    placesPopulate: function(dataSource = hbnb.data.places) {
         const cardsListTag = document.querySelector("#places-list > .cards")
 
         // Use innerHTML to add the HTML content to the page
-        for (let place of hbnb.data.places) {
+        for (let place of dataSource) {
             // NOTE: Consider storing the HTML below elsewhere instead of within this function
             // e.g. hbnb.html.places.card
             amenities_spans = ``
             if (place.amenities.length > 0) {
                 for (let amenity of place.amenities) {
-                    amenities_spans += `<span class="` + amenity.toLowerCase() + `"></span>`
+                    amenities_spans += `<span class="` + amenity.toLowerCase().replace(" ", "-") + `"></span>`
                 }
             }
 
@@ -135,7 +135,8 @@ hbnb = {
                 return response.json()
             }).then((json) => {
                 console.log(json)
-                // FIXME: Depending on the response data, regenerate the Places shown
+                // Regenerate the Places shown
+                hbnb.placesPopulate(json)
             }).catch((e) => {
                 console.error(e)
             }).finally(() => {
