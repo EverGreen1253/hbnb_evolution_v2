@@ -307,6 +307,7 @@ class PlaceSearch(Resource):
         name_conditions = ""
         price_conditions = ""
         amenities_condition = ""
+        amenities_and_clause = ""
         amenities_present_condition = ""
 
         if len(name) > 0:
@@ -338,10 +339,10 @@ class PlaceSearch(Resource):
             if where_clause == "":
                 where_clause = "WHERE "
             else:
-                and_clause = "AND "
+                amenities_and_clause = "AND "
             amenities_present_condition = "(amenities != '')"
 
-        conditions = where_clause + name_conditions + and_clause + price_conditions + amenities_present_condition
+        conditions = where_clause + name_conditions + and_clause + price_conditions + amenities_and_clause + amenities_present_condition
 
         query = "SELECT * FROM ( \
             SELECT p.*, GROUP_CONCAT(a.name) AS amenities \
