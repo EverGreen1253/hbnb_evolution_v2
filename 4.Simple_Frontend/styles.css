@@ -54,6 +54,7 @@ ul, li {
     background-position: center 10px;
     padding-bottom: 10px;
     box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+    z-index: 1;
 }
 
 #loader.hide {
@@ -78,6 +79,7 @@ ul, li {
     background-position: center 10px;
     padding-bottom: 10px;
     box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+    z-index: 2;
 }
 
 #error.hide {
@@ -181,6 +183,86 @@ main {
 #search {
     padding: 5px 15px;
     cursor: pointer;
+}
+
+#login-modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+}
+
+#login-modal.hide {
+    z-index: -5;
+    opacity: 0;
+    transition: all 0s;
+}
+
+#login-modal.show {
+    z-index: 10;
+    opacity: 1;
+    transition: all 0.3s;
+}
+
+#login-modal .bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: rgba(0,0,0,0.7);
+    width: 100%;
+    height: 100%;
+    z-index: 8;
+}
+
+#login-modal .modal {
+    position: absolute;
+    z-index: 9;
+    background-color: #FFF;
+    padding: 0;
+    border-radius: 5px;
+    border: 3px solid #CCC;
+    left: calc(50% - 127px);
+    top: calc(50% - 57px);
+}
+
+#login-modal .modal .title {
+    font-weight: bold;
+    font-size: 1.8rem;
+    margin: 0 0 20px 0;
+    padding: 10px 20px 5px 20px;
+    border-bottom: 1px solid #CCC;
+    background-color: #E5E5E5;
+}
+
+#login-modal .modal .body {
+    padding: 0 20px 10px 20px;
+}
+
+#login-modal .modal .body label{
+    display: block;
+    margin: 5px 0;
+}
+
+#login-modal .modal .body label span {
+    display: inline-block;
+    width: 72px;
+}
+
+#login-modal .modal .body .buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#login-modal .modal .body .buttons button {
+    margin: 0 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#login-modal .modal .body .buttons button[disabled] {
+    cursor: default;
 }
 
 #places-list ul.cards {

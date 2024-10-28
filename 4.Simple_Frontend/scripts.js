@@ -43,6 +43,7 @@ hbnb = {
     },
     placesPopulate: function(dataSource = hbnb.data.places) {
         const cardsListTag = document.querySelector("#places-list > .cards")
+        cardsListTag.innerHTML = ""
 
         // Use innerHTML to add the HTML content to the page
         for (let place of dataSource) {
@@ -135,8 +136,7 @@ hbnb = {
                 return response.json()
             }).then((json) => {
                 console.log(json)
-                // Regenerate the Places shown
-                hbnb.placesPopulate(json)
+                hbnb.filterSearchAction(json)
             }).catch((e) => {
                 console.error(e)
             }).finally(() => {
@@ -144,8 +144,64 @@ hbnb = {
             })
         })
     },
-    filterSearchAction: function() {
+    filterSearchAction: function(data) {
+        // Get rid of existing Places + Regenerate the Places shown
+        hbnb.placesPopulate(data)
+    },
+    loginModalInit: function() {
+        let loginShowBtn = document.getElementById('login-link');
+        let loginModal = document.getElementById('login-modal');
+        let loginSubmitBtn = document.getElementById('login-submit');
+        let loginHideBtn = document.getElementById('login-cancel');
 
+        loginShowBtn.addEventListener('click', function(e) {
+            //prevent redirection to login page
+            e.preventDefault();
+
+            // loginModal will unhide/appear
+            loginModal.setAttribute('class', 'show');
+
+            // enable the text fields and buttons
+            hbnb.loginModalEnable(loginModal);
+        })
+
+        loginSubmitBtn.addEventListener('click', function() {
+            hbnb.loginModalSubmit(loginModal);
+            console.log("submit the login form");
+        });
+
+        loginHideBtn.addEventListener('click', function() {
+            hbnb.loginModalDisable(loginModal);
+
+            // loginModal will unhide/appear
+            loginModal.setAttribute('class', 'hide');
+        });
+    },
+    loginModalEnable: function(loginModal) {
+        let inputs = loginModal.querySelectorAll("input");
+        let buttons = loginModal.querySelectorAll("button");
+
+        inputs[0].removeAttribute("disabled");
+        inputs[1].removeAttribute("disabled");
+        buttons[0].removeAttribute("disabled");
+        buttons[1].removeAttribute("disabled");
+    },
+    loginModalDisable: function(loginModal) {
+        let inputs = loginModal.querySelectorAll("input");
+        let buttons = loginModal.querySelectorAll("button");
+
+        inputs[0].setAttribute("disabled", "");
+        inputs[1].setAttribute("disabled", "");
+        buttons[0].setAttribute("disabled", "");
+        buttons[1].setAttribute("disabled", "");
+    },
+    loginModalSubmit: function(loginModal) {
+        hbnb.loginModalDisable(loginModal);
+
+        //Show submission overlay
+
+        console.log('submit!')
+        // FIXME:
     },
 
     init: function() {
@@ -182,6 +238,8 @@ hbnb = {
                 // TODO:
                 break;
         }
+
+        hbnb.loginModalInit();
     }
 }
 

@@ -291,13 +291,14 @@ class PlaceSearch(Resource):
 
         # --- Example query ---
         # SELECT * FROM (
-        #     SELECT p.*, GROUP_CONCAT(a.name) AS amenities
+        #     SELECT p.*, GROUP_CONCAT(a.name) AS amenities, GROUP_CONCAT(b.name) AS selected_amenities
         #     FROM places p
         #     LEFT JOIN place_amenity pa ON p.id = pa.place_id
+        #     LEFT JOIN amenities a ON pa.amenity_id  = a.id
         #     LEFT JOIN (
         #         SELECT * FROM amenities
         #         WHERE amenities.name IN ('wi-fi', 'toilet')
-        #     ) a ON pa.amenity_id  = a.id
+        #     ) b ON pa.amenity_id  = b.id
         #     GROUP BY p.id
         # ) as x
         # WHERE (title LIKE "%cozy%" OR description LIKE "%cozy%") AND (price >= 250)
@@ -340,18 +341,19 @@ class PlaceSearch(Resource):
                 where_clause = "WHERE "
             else:
                 amenities_and_clause = "AND "
-            amenities_present_condition = "(amenities != '')"
+            amenities_present_condition = "(selected_amenities != '')"
 
         conditions = where_clause + name_conditions + and_clause + price_conditions + amenities_and_clause + amenities_present_condition
 
         query = "SELECT * FROM ( \
-            SELECT p.*, GROUP_CONCAT(a.name) AS amenities \
+            SELECT p.*, GROUP_CONCAT(a.name) AS amenities, GROUP_CONCAT(b.name) AS selected_amenities \
             FROM places p \
             LEFT JOIN place_amenity pa ON p.id = pa.place_id \
+            LEFT JOIN amenities a ON pa.amenity_id  = a.id \
             LEFT JOIN ( \
                 SELECT * FROM amenities \
                 " + amenities_condition + " \
-            ) a ON pa.amenity_id  = a.id \
+            ) b ON pa.amenity_id  = b.id \
             GROUP BY p.id \
         ) as x " + conditions
 
