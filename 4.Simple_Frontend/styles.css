@@ -101,6 +101,29 @@ header {
     text-align: right;
 }
 
+nav #login {
+    display: inline-block;
+}
+
+nav #logout {
+    display: none;
+}
+
+nav.logged-in #login{
+    display: none;
+}
+
+nav.logged-in #logout {
+    display: inline-block;
+}
+
+nav #logout .email{
+    font-weight: bold;
+    padding-right: 10px;
+    margin-right: 10px;
+    border-right: 1px solid #999;
+}
+
 nav a {
     color: #fff;
     text-decoration: none;
@@ -224,16 +247,24 @@ main {
     border-radius: 5px;
     border: 3px solid #CCC;
     left: calc(50% - 127px);
-    top: calc(50% - 57px);
+    top: calc(50% - 105px);
 }
 
 #login-modal .modal .title {
     font-weight: bold;
     font-size: 1.8rem;
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
     padding: 10px 20px 5px 20px;
     border-bottom: 1px solid #CCC;
     background-color: #E5E5E5;
+}
+
+#login-modal .modal .message {
+    height: 16px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: #FF0000;
+    font-weight: bold;
 }
 
 #login-modal .modal .body {
@@ -250,8 +281,16 @@ main {
     width: 72px;
 }
 
+#login-modal .modal .body label input {
+    padding: 5px;
+}
+
+#login-modal .modal .body label input[disabled] {
+    color: #CCC !important;
+}
+
 #login-modal .modal .body .buttons {
-    margin-top: 20px;
+    margin-top: 30px;
     text-align: center;
 }
 
@@ -263,6 +302,25 @@ main {
 
 #login-modal .modal .body .buttons button[disabled] {
     cursor: default;
+}
+
+#login-modal .modal .submitting {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 50px);
+    top: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    background-image: url(images/loader.gif);
+    background-repeat: no-repeat;
+    background-position: center 40px;
+    padding-top: 50px;
+}
+
+#login-modal .modal .submitting.show {
+    display: flex;
 }
 
 #places-list ul.cards {

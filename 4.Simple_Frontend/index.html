@@ -18,7 +18,14 @@
 
     <header>
         <nav>
-            <a href="login.html" id="login-link">Login</a>
+            <span id="login">
+                <a href="login">Login</a>
+            </span>
+            <span id="logout">
+                <span>Logged in as: </span>
+                <span class="email"></span>
+                <a href="logout">Logout</a>
+            </span>
         </nav>
     </header>
     <main>
@@ -58,20 +65,22 @@
             <div class="bg"></div>
             <div class="modal">
                 <div class="title">Log in to your Account</div>
+                <div class="message"></div>
                 <div class="body">
                     <label>
-                        <span>Username: </span>
-                        <input disabled type="text" name="username" placeholder="Username" />
+                        <span>Email: </span>
+                        <input disabled type="text" name="email" />
                     </label>
                     <label>
                         <span>Password: </span>
-                        <input disabled type="text" name="password" placeholder="Password" />
+                        <input disabled type="text" name="password" />
                     </label>
                     <div class="buttons">
                         <button disabled id="login-submit">Submit</button>
                         <button disabled id="login-cancel">Cancel</button>
                     </div>
                 </div>
+                <div class="submitting">Logging you in...</div>
             </div>
         </div>
     </main>

@@ -149,10 +149,13 @@ hbnb = {
         hbnb.placesPopulate(data)
     },
     loginModalInit: function() {
-        let loginShowBtn = document.getElementById('login-link');
+        let loginShowBtn = document.getElementById('login').querySelector("a");
         let loginModal = document.getElementById('login-modal');
         let loginSubmitBtn = document.getElementById('login-submit');
         let loginHideBtn = document.getElementById('login-cancel');
+        let msgContainer = loginModal.querySelector(".modal .message");
+
+        msgContainer.innerHTML = "";
 
         loginShowBtn.addEventListener('click', function(e) {
             //prevent redirection to login page
@@ -167,7 +170,6 @@ hbnb = {
 
         loginSubmitBtn.addEventListener('click', function() {
             hbnb.loginModalSubmit(loginModal);
-            console.log("submit the login form");
         });
 
         loginHideBtn.addEventListener('click', function() {
@@ -198,14 +200,101 @@ hbnb = {
     loginModalSubmit: function(loginModal) {
         hbnb.loginModalDisable(loginModal);
 
-        //Show submission overlay
+        let inputs = loginModal.querySelectorAll("input");
+        const email = inputs[0].value
+        const password = inputs[1].value
 
-        console.log('submit!')
-        // FIXME:
+        let loginData = {
+            email: email,
+            password: password
+        }
+
+        // console.log('Submitting login information')
+        // console.log(loginData)
+
+        // Error check submitted info
+        // NOTE: We should ideally encrypt the submitted data and not transmit it as plain-text
+        if ((email.trim() == "") || (password.trim() == "")) {
+            hbnb.loginErrorMessage(loginModal, "Invalid username / password")
+        } else {
+            //Show submission overlay
+            let submitLoader = loginModal.querySelector(".submitting");
+            submitLoader.setAttribute('class', 'submitting show');
+
+            // API call starts here
+            // curl -X POST "http://127.0.0.1:5000/api/v1/auth/login" -H "Content-Type: application/json" -d '{ "email": "john.doe@example.com", "password": "cowabunga" }'
+
+            const searchURL = "http://localhost:5000/api/v1/auth/login";
+            fetch(searchURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(loginData),
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return response.json()
+            }).then((json) => {
+                console.log(json)
+                // Remove modal
+                loginModal.setAttribute('class', 'hide');
+
+                // Store token somewhere
+                localStorage.setItem("hbnb_v2_token", json.access_token);
+                localStorage.setItem("hbnb_v2_token_owner", email);
+
+                // Update upper-right bubble to indicate 'Logged-in' status
+                hbnb.loggedInStateUpdate();
+            }).catch((e) => {
+                console.error(e)
+                hbnb.loginErrorMessage(loginModal, e)
+            }).finally(() => {
+                console.log('Login completed!')
+                submitLoader.setAttribute('class', 'submitting');
+            })
+        }
+    },
+    loginErrorMessage: function(loginModal, message) {
+        let msgContainer = loginModal.querySelector(".modal .message");
+        msgContainer.innerHTML = message;
+    },
+    loggedInStateUpdate: function() {
+        //check if token and token_owner exists in localStorage
+        // If exists, update the upper right bubble to indicate logged-in status
+        const nav = document.getElementsByTagName("nav")[0];
+        const email = document.getElementById("logout").querySelector(".email");
+
+        const token = localStorage.getItem("hbnb_v2_token");
+        const owner = localStorage.getItem("hbnb_v2_token_owner");
+
+        if (owner && token) {
+            nav.setAttribute("class", "logged-in");
+            email.innerHTML = owner;
+        }
+    },
+    logoutInit: function () {
+        const nav = document.getElementsByTagName("nav")[0];
+        const logout = document.getElementById("logout");
+
+        logout.addEventListener('click', function(e){
+            e.preventDefault();
+
+            nav.setAttribute("class", "");
+
+            localStorage.removeItem("hbnb_v2_token");
+            localStorage.removeItem("hbnb_v2_token_owner");
+        })
     },
 
     init: function() {
         const pageId = document.getElementsByTagName('body')[0].getAttribute('page-id')
+
+        hbnb.loggedInStateUpdate();
+        hbnb.logoutInit();
 
         switch(pageId) {
             case 'index':
